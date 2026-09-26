@@ -9,6 +9,7 @@ out
 
 # logs / os
 *.log
+*.tsbuildinfo
 .DS_Store
 Thumbs.db
 

@@ -1,11 +1,11 @@
 const sections = [
-  { href: "/home", icon: "🏠", label: "Home", desc: "What needs your attention?" },
-  { href: "/autopilot", icon: "🤖", label: "Auto Pilot", desc: "Current plan + Guide Me" },
-  { href: "/create", icon: "✨", label: "Create", desc: "Freeform prompt → preview" },
-  { href: "/schedule", icon: "📅", label: "Schedule", desc: "Upcoming + reschedule" },
-  { href: "/customers", icon: "💬", label: "Customers", desc: "Comments, leads, follow-ups" },
-  { href: "/results", icon: "📊", label: "Results", desc: "Metrics + AI learnings" },
-  { href: "/brand", icon: "🎨", label: "Brand", desc: "Identity, media, facts" }
+  { href: "/onboarding", icon: "📝", label: "Onboarding", desc: "5-step setup · live", live: true },
+  { href: "/brand", icon: "🎨", label: "Brand", desc: "Identity, media, facts · live", live: true },
+  { href: "/autopilot", icon: "🤖", label: "Auto Pilot", desc: "Current plan + Guide Me", live: false },
+  { href: "/create", icon: "✨", label: "Create", desc: "Freeform prompt → preview", live: false },
+  { href: "/schedule", icon: "📅", label: "Schedule", desc: "Upcoming + reschedule", live: false },
+  { href: "/customers", icon: "💬", label: "Customers", desc: "Comments, leads, follow-ups", live: false },
+  { href: "/results", icon: "📊", label: "Results", desc: "Metrics + AI learnings", live: false }
 ];
 
 export default function Page() {
@@ -20,13 +20,13 @@ export default function Page() {
         </p>
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           {sections.map((s) => (
-            <div key={s.href} className="rounded-2xl border bg-card p-4" style={{ borderColor: "#E3DED2" }}>
+            <a key={s.href} href={s.live ? s.href : "#"} className="rounded-2xl border bg-card p-4" style={{ borderColor: "#E3DED2" }}>
               <p className="font-semibold">
                 {s.icon} {s.label}
               </p>
               <p className="text-sm text-muted">{s.desc}</p>
-              <p className="mt-1 font-mono text-xs text-muted">{s.href} → coming soon</p>
-            </div>
+              <p className="mt-1 font-mono text-xs text-muted">{s.href}{s.live ? "" : " → coming soon"}</p>
+            </a>
           ))}
         </div>
         <p className="mt-8 font-mono text-xs text-muted">
