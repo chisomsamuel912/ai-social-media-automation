@@ -1,10 +1,45 @@
 "use client";
 import type { PlannedIdea } from "@/lib/ai/engine";
+import { queueKey, suggestTimes, type QueueItem } from "@/lib/scheduling";
 import VisualPreview from "./VisualPreview";
 
 const PLATFORM_ICON: Record<string, string> = { whatsapp: "💬", facebook: "📘", instagram: "📸", tiktok: "🎵" };
 
+export function loadQueue(): QueueItem[] {
+  try {
+    return JSON.parse(localStorage.getItem("schedule-queue") ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
 export default function PlanResults({ ideas, blocked, businessName }: { ideas: PlannedIdea[]; blocked: number; businessName?: string }) {
+  function approveAll() {
+    const slots = suggestTimes(ideas.reduce((n, i) => n + i.variants.length, 0));
+    let s = 0;
+    const items: QueueItem[] = [];
+    for (const idea of ideas) {
+      for (const v of idea.variants) {
+        const slot = slots[s++];
+        items.push({
+          key: queueKey(idea.topic, v.platform, slot),
+          topic: idea.topic,
+          platform: v.platform,
+          caption: v.caption,
+          hashtags: v.hashtags,
+          scheduledAt: slot,
+          status: "scheduled"
+        });
+      }
+    }
+    const existing = loadQueue();
+    const keys = new Set(existing.map((q) => q.key));
+    const merged = [...existing, ...items.filter((q) => !keys.has(q.key))];
+    try {
+      localStorage.setItem("schedule-queue", JSON.stringify(merged));
+    } catch {}
+    window.location.href = "/schedule";
+  }
   if (ideas.length === 0) return <p className="text-sm text-muted">No fresh ideas — everything matched recent history. Try a different guide.</p>;
   return (
     <div className="grid gap-3">
@@ -40,6 +75,9 @@ export default function PlanResults({ ideas, blocked, businessName }: { ideas: P
           </div>
         </div>
       ))}
+      <button onClick={approveAll} className="btn-primary w-full py-3 text-base">
+        Approve All & Schedule →
+      </button>
     </div>
   );
 }
