@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import SessionChip from "@/components/SessionChip";
+import { useAuth } from "@/components/AuthProvider";
 import { loadQueue } from "@/components/PlanResults";
 import { followUpDue } from "@/lib/customers";
 
@@ -21,9 +23,15 @@ interface Attention {
 }
 
 export default function Page() {
+  const { user, ready } = useAuth();
+  const router = useRouter();
   const [attention, setAttention] = useState<Attention[]>([]);
   const [feedback, setFeedback] = useState("");
   const [thanks, setThanks] = useState(false);
+
+  useEffect(() => {
+    if (ready && !user) router.replace("/login");
+  }, [ready, user, router]);
 
   useEffect(() => {
     const list: Attention[] = [];
@@ -59,6 +67,14 @@ export default function Page() {
     setFeedback("");
     setThanks(true);
     setTimeout(() => setThanks(false), 2500);
+  }
+
+  if (!ready || !user) {
+    return (
+      <main className="stage flex items-center justify-center">
+        <p className="text-sm text-muted">Taking you to sign in…</p>
+      </main>
+    );
   }
 
   return (
