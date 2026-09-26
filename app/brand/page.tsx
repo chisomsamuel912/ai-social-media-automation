@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const inputCls = "w-full rounded-xl border bg-white px-3 py-2 text-sm";
 type Tab = "facts" | "media";
 
 export default function BrandPage() {
@@ -53,52 +52,57 @@ export default function BrandPage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-10">
-      <p className="text-sm text-muted">Brand · Media Library · Verified Facts</p>
-      <h1 className="mt-1 text-3xl">Your brand & truths</h1>
-      <p className="mt-1 text-sm text-muted">The AI only uses facts saved here — it never invents prices or policies.</p>
+    <main className="stage px-4 py-10">
+      <div className="orb" style={{ width: 400, height: 400, right: "-120px", top: "-100px", background: "#D9CFC0" }} />
+      <div className="orb orb-b" style={{ width: 360, height: 360, left: "-120px", bottom: "-140px", background: "#9CAF88" }} />
+      <div className="relative mx-auto max-w-2xl">
+        <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">Brand · Media · Truths</p>
+        <h1 className="grad-text mt-1 text-center text-4xl">Your brand & truths</h1>
+        <p className="mt-1 text-center text-sm text-muted">The AI only uses facts saved here — it never invents prices or policies.</p>
 
-      <div className="mt-4 flex items-center gap-2">
-        <input className={inputCls} value={businessId} onChange={(e) => setBusinessId(e.target.value)} placeholder="Business ID (auto-filled after onboarding)" />
-        <button onClick={load} className="rounded-xl border px-4 py-2 text-sm">Load</button>
-      </div>
+        <div className="glass mt-6 flex items-center gap-2 p-2.5">
+          <input className="field !border-0 !bg-transparent" value={businessId} onChange={(e) => setBusinessId(e.target.value)} placeholder="Business ID (auto-filled after onboarding)" />
+          <button onClick={load} className="btn-primary shrink-0">Load</button>
+        </div>
 
-      <div className="mt-4 flex gap-2">
-        <button onClick={() => setTab("facts")} className={`rounded-xl px-4 py-2 text-sm ${tab === "facts" ? "bg-moss text-white" : "border"}`}>Verified Facts</button>
-        <button onClick={() => setTab("media")} className={`rounded-xl px-4 py-2 text-sm ${tab === "media" ? "bg-moss text-white" : "border"}`}>Media Library</button>
-      </div>
+        <div className="mt-4 flex justify-center gap-2">
+          <button onClick={() => setTab("facts")} className={tab === "facts" ? "btn-primary" : "btn-ghost"}>Verified Facts</button>
+          <button onClick={() => setTab("media")} className={tab === "media" ? "btn-primary" : "btn-ghost"}>Media Library</button>
+        </div>
 
-      {msg && <p className="mt-3 text-sm text-muted">{msg}</p>}
+        {msg && <p className="mt-3 text-center text-sm text-muted">{msg}</p>}
 
-      {tab === "facts" && (
-        <div className="mt-4 grid gap-3">
-          {facts.length === 0 && <p className="text-sm text-muted">No facts yet. Add prices, products, delivery info…</p>}
-          {facts.map((f) => (
-            <div key={f.key} className="flex gap-2 rounded-xl border bg-card px-3 py-2 text-sm" style={{ borderColor: "#E3DED2" }}>
-              <b>{f.key}</b><span className="text-muted">{f.value}</span>
+        <div className="glass mt-4 p-5">
+          {tab === "facts" && (
+            <div className="grid gap-2.5">
+              {facts.length === 0 && <p className="text-sm text-muted">No facts yet. Add prices, products, delivery info…</p>}
+              {facts.map((f) => (
+                <div key={f.key} className="glass-soft flex gap-2 px-3 py-2.5 text-sm">
+                  <b>{f.key}</b><span className="text-muted">{f.value}</span>
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <input className="field" value={fKey} onChange={(e) => setFKey(e.target.value)} placeholder="e.g. jollof-party-price" />
+                <input className="field" value={fVal} onChange={(e) => setFVal(e.target.value)} placeholder="e.g. ₦25,000 per tray" />
+                <button onClick={saveFact} className="btn-primary shrink-0">Save</button>
+              </div>
             </div>
-          ))}
-          <div className="flex gap-2">
-            <input className={inputCls} value={fKey} onChange={(e) => setFKey(e.target.value)} placeholder="e.g. jollof-party-price" />
-            <input className={inputCls} value={fVal} onChange={(e) => setFVal(e.target.value)} placeholder="e.g. ₦25,000 per tray" />
-            <button onClick={saveFact} className="rounded-xl bg-moss px-4 py-2 text-sm text-white">Save</button>
-          </div>
+          )}
+          {tab === "media" && (
+            <div className="grid gap-2.5">
+              {assets.length === 0 && <p className="text-sm text-muted">No media yet. Paste an image URL (file upload comes with Storage wiring).</p>}
+              {assets.map((a) => (
+                <div key={a.id} className="glass-soft truncate px-3 py-2.5 text-sm">🖼 {a.url}</div>
+              ))}
+              <div className="flex gap-2">
+                <input className="field" value={mUrl} onChange={(e) => setMUrl(e.target.value)} placeholder="https://…/product-photo.jpg" />
+                <button onClick={saveMedia} className="btn-primary shrink-0">Add</button>
+              </div>
+              <p className="text-xs text-muted">Rule: promo posts prefer your real photo; educational posts use a template.</p>
+            </div>
+          )}
         </div>
-      )}
-
-      {tab === "media" && (
-        <div className="mt-4 grid gap-3">
-          {assets.length === 0 && <p className="text-sm text-muted">No media yet. Paste an image URL (file upload comes with Supabase Storage wiring).</p>}
-          {assets.map((a) => (
-            <div key={a.id} className="truncate rounded-xl border bg-card px-3 py-2 text-sm" style={{ borderColor: "#E3DED2" }}>🖼 {a.url}</div>
-          ))}
-          <div className="flex gap-2">
-            <input className={inputCls} value={mUrl} onChange={(e) => setMUrl(e.target.value)} placeholder="https://…/product-photo.jpg" />
-            <button onClick={saveMedia} className="rounded-xl bg-moss px-4 py-2 text-sm text-white">Add</button>
-          </div>
-          <p className="text-xs text-muted">Rule: promo posts prefer your real photo; educational posts use a template.</p>
-        </div>
-      )}
+      </div>
     </main>
   );
 }

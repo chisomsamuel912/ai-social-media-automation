@@ -10,22 +10,24 @@ const sections = [
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-paper text-ink">
-      <div className="mx-auto max-w-4xl px-6 py-12">
-        <p className="text-sm text-muted">Phase 2 · Foundations · $0 MVP skeleton</p>
-        <h1 className="mt-2 text-4xl">Growpilot dashboard shell</h1>
-        <p className="mt-2 text-muted">
-          Give the AI direction once. Let it handle the content work. Routes below are
-          placeholders wired in the next phases.
+    <main className="stage">
+      <div className="orb" style={{ width: 460, height: 460, left: "-140px", top: "-120px", background: "#9CAF88" }} />
+      <div className="orb orb-b" style={{ width: 520, height: 520, right: "-160px", top: "10%", background: "#D9CFC0" }} />
+      <div className="relative mx-auto max-w-4xl px-6 py-14">
+        <p className="text-sm text-muted">Phase 3 · $0 MVP</p>
+        <h1 className="grad-text mt-2 text-5xl">Growpilot</h1>
+        <p className="mt-2 max-w-xl text-muted">
+          Give the AI direction once. Let it handle the content work.
         </p>
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           {sections.map((s) => (
-            <a key={s.href} href={s.live ? s.href : "#"} className="rounded-2xl border bg-card p-4" style={{ borderColor: "#E3DED2" }}>
-              <p className="font-semibold">
-                {s.icon} {s.label}
-              </p>
+            <a key={s.href} href={s.live ? s.href : "#"}
+              className={`glass p-5 ${s.live ? "lift" : "opacity-70"}`}>
+              <p className="text-lg font-semibold">{s.icon} {s.label}</p>
               <p className="text-sm text-muted">{s.desc}</p>
-              <p className="mt-1 font-mono text-xs text-muted">{s.href}{s.live ? "" : " → coming soon"}</p>
+              <p className="mt-2 font-mono text-xs text-muted">
+                {s.live ? `${s.href} →` : `${s.href} · coming soon`}
+              </p>
             </a>
           ))}
         </div>
