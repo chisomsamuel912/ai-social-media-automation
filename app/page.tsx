@@ -1,8 +1,8 @@
 const sections = [
   { href: "/onboarding", icon: "📝", label: "Onboarding", desc: "5-step setup · live", live: true },
   { href: "/brand", icon: "🎨", label: "Brand", desc: "Identity, media, facts · live", live: true },
-  { href: "/autopilot", icon: "🤖", label: "Auto Pilot", desc: "Current plan + Guide Me", live: false },
-  { href: "/create", icon: "✨", label: "Create", desc: "Freeform prompt → preview", live: false },
+  { href: "/autopilot", icon: "🤖", label: "Auto Pilot", desc: "Current plan + Guide Me · live", live: true },
+  { href: "/create", icon: "✨", label: "Create", desc: "Freeform prompt → preview · live", live: true },
   { href: "/schedule", icon: "📅", label: "Schedule", desc: "Upcoming + reschedule", live: false },
   { href: "/customers", icon: "💬", label: "Customers", desc: "Comments, leads, follow-ups", live: false },
   { href: "/results", icon: "📊", label: "Results", desc: "Metrics + AI learnings", live: false }
