@@ -93,9 +93,7 @@ export default function OnboardingPage() {
         </>)}
         {step === 2 && (<>
           {field("Tone of voice", <select className={inputCls} value={draft.tone} onChange={(e) => set("tone", e.target.value)}><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="playful">Playful</option><option value="bold">Bold</option></select>)}
-          {field("Main topics (comma separated) *", <input className={inputCls} value={draft.topics} onChange={(e) => set("topics", e.target.value)} placeholder="saving, meal prep, behind the scenes" />)}
-          {field("Topics to avoid", <input className={inputCls} value={draft.avoidTopics} onChange={(e) => set("avoidTopics", e.target.value)} placeholder="politics" />)}
-          {field("Goals (comma separated)", <input className={inputCls} value={draft.goals} onChange={(e) => set("goals", e.target.value)} placeholder="orders, awareness" />)}
+          <p className="text-xs text-muted">The AI figures out topics and goals from your description and audience — no need to spell them out.</p>
         </>)}
         {step === 3 && (<>
           <div><p className="text-sm font-medium">Platforms (MVP: WhatsApp + Facebook)</p>

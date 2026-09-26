@@ -5,9 +5,6 @@ export interface OnboardingDraft {
   audience: string;
   location: string;
   tone: string;
-  topics: string;
-  avoidTopics: string;
-  goals: string;
   platforms: string[];
   frequency: string;
   publishingMode: string;
@@ -21,9 +18,6 @@ export const EMPTY_DRAFT: OnboardingDraft = {
   audience: "",
   location: "",
   tone: "friendly",
-  topics: "",
-  avoidTopics: "",
-  goals: "",
   platforms: ["whatsapp", "facebook"],
   frequency: "let_ai_decide",
   publishingMode: "remind_me",
@@ -41,14 +35,12 @@ export const MVP_PLATFORMS = [
 /** Weighted completeness 0-100. Required fields weigh more. */
 export function completeness(d: OnboardingDraft): number {
   const checks: Array<[boolean, number]> = [
-    [d.name.trim().length > 1, 20],
-    [d.description.trim().length > 9, 15],
-    [d.products.trim().length > 2, 10],
-    [d.audience.trim().length > 2, 15],
-    [d.topics.trim().length > 2, 15],
+    [d.name.trim().length > 1, 25],
+    [d.description.trim().length > 9, 20],
+    [d.products.trim().length > 2, 15],
+    [d.audience.trim().length > 2, 20],
     [d.platforms.length > 0, 10],
-    [d.salesChannel.trim().length > 0, 10],
-    [d.location.trim().length > 0, 5]
+    [d.salesChannel.trim().length > 0, 10]
   ];
   return checks.reduce((sum, [ok, w]) => sum + (ok ? w : 0), 0);
 }

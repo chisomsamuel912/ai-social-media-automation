@@ -13,8 +13,7 @@ describe("onboarding completeness", () => {
       description: "Jollof catering and weekly meal prep in Lagos",
       products: "Party jollof, meal plans",
       audience: "Busy parents 25-40",
-      location: "Lagos",
-      topics: "food, catering"
+      location: "Lagos"
     })).toBe(100);
   });
 });
