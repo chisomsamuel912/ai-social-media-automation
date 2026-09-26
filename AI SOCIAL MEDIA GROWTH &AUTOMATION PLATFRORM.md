@@ -868,9 +868,14 @@ It is whether the app successfully moves the user from:
 “I need to post something.”  
    
 to:  
-   
+    
 “My social media is being handled.”  
-   
+    
+34\. Accounts & Sign-In (added during MVP build)  
+    
+Owners sign up with email + password (Google sign-in optional, configured later). One account owns its businesses; every row carries the owner, and database policies ensure an owner only ever sees their own data. Sessions persist in the browser; signing out clears the device. Deleting a business removes everything attached. No passwords are stored by the app itself — authentication is handled entirely by the backend provider.  
+    
+Must-have addition: sign-up page, login page, session display with sign-out, owner stored on each business, owner-only data policies.
  
 
 AI Social Media Growth & Automation Platform  
@@ -1736,7 +1741,12 @@ It is whether the app successfully moves the user from:
 “I need to post something.”  
    
 to:  
-   
+    
 “My social media is being handled.”  
-   
+    
+34\. Accounts & Sign-In (added during MVP build)  
+    
+Owners sign up with email + password (Google sign-in optional, configured later). One account owns its businesses; every row carries the owner, and database policies ensure an owner only ever sees their own data. Sessions persist in the browser; signing out clears the device. Deleting a business removes everything attached. No passwords are stored by the app itself — authentication is handled entirely by the backend provider.  
+    
+Must-have addition: sign-up page, login page, session display with sign-out, owner stored on each business, owner-only data policies.
    

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { EMPTY_DRAFT, MVP_PLATFORMS, completeness, type OnboardingDraft } from "@/lib/onboarding";
 
 const STEPS = ["Business", "Audience", "Style", "Platforms", "Sales"];
@@ -14,6 +15,7 @@ function field(label: string, node: React.ReactNode) {
 }
 
 export default function OnboardingPage() {
+  const { user } = useAuth();
   const [draft, setDraft] = useState<OnboardingDraft>(EMPTY_DRAFT);
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<string>("");
@@ -40,7 +42,7 @@ export default function OnboardingPage() {
     const res = await fetch("/api/onboarding", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(draft)
+      body: JSON.stringify({ ...draft, ownerId: user?.id })
     });
     const body = await res.json().catch(() => ({}));
     if (res.ok) {

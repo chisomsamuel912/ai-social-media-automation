@@ -5,6 +5,7 @@ import { audit, tooMany } from "@/lib/audit";
 import { clientKey, rateLimit } from "@/lib/ratelimit";
 
 const Body = z.object({
+  ownerId: z.string().uuid().optional(),
   name: z.string().min(2),
   description: z.string().default(""),
   products: z.string().default(""),
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
   const { data: biz, error: bizErr } = await db
     .from("businesses")
     .insert({
+      owner_id: b.ownerId ?? null,
       name: b.name,
       description: b.description,
       sales_channels: [b.salesChannel],

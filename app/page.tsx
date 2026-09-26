@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import SessionChip from "@/components/SessionChip";
 import { loadQueue } from "@/components/PlanResults";
 import { followUpDue } from "@/lib/customers";
 
@@ -65,6 +66,9 @@ export default function Page() {
       <div className="orb" style={{ width: 460, height: 460, left: "-140px", top: "-120px", background: "#9CAF88" }} />
       <div className="orb orb-b" style={{ width: 520, height: 520, right: "-160px", top: "10%", background: "#D9CFC0" }} />
       <div className="relative mx-auto max-w-4xl px-6 py-14">
+        <div className="flex justify-end">
+          <SessionChip />
+        </div>
         <p className="text-sm text-muted">Phase 9 · $0 MVP · all systems live</p>
         <h1 className="grad-text mt-2 text-5xl">Growpilot</h1>
         <p className="mt-2 max-w-xl text-muted">Give the AI direction once. Let it handle the content work.</p>
