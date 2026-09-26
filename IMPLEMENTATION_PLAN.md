@@ -6,8 +6,8 @@
 **Allowed now:** Next.js, TypeScript, Tailwind, shadcn/ui, Supabase, provider-agnostic AI interface.
 **Banned until actually required:** Replicate, Inngest, Trigger.dev, PostHog, Sentry, Prisma/Drizzle, paid AI models.
 **Goal:** “I need to post something.” → “My social media is being handled.”
-**Platform scope:** WhatsApp only for MVP (Status + broadcast/direct + wa.me CTA). Instagram, Facebook, TikTok, YouTube, LinkedIn deferred to post-MVP.
-**Core loop:** Profile → Plan → Create → Visuals (template, WhatsApp 1:1) → WhatsApp formatting → Review → Approve → Schedule/Remind → Mark posted → Monitor (manual) → Learn → Replies/Leads/Follow-up → Repeat
+**Platform scope:** WhatsApp + Facebook only for MVP. Instagram, TikTok, YouTube, LinkedIn deferred to post-MVP.
+**Core loop:** Profile → Plan → Create → Template visuals (WhatsApp 1:1 + Facebook) → WhatsApp/Facebook formatting → Review → Approve → Schedule/Remind → Mark posted → Monitor (manual) → Learn → Replies/Leads/Follow-up → Repeat
 
 > Upgrade-ready: every banned tool has a defined insertion point. Do not pre-build abstractions beyond a thin interface.
 
@@ -22,7 +22,7 @@
 5. No paid AI. Ship `AIProvider` interface with free-first providers: Ollama (local dev, $0), Gemini Flash free tier / Groq Llama free tier (user brings free key), template fallback when no key. Never hardcode OpenAI/Replicate.
 6. No generated images/video APIs. Visuals = code-rendered templates (Tailwind/SVG/Canvas) + user uploads. AI supplies text/headlines only.
 7. No PostHog/Sentry. Use Vercel logs + Supabase `app_logs` table + simple `/api/health` + user feedback form.
-8. WhatsApp-only publish: Remind Me + copy-pack (message + 1:1 image + wa.me CTA) + mark-posted. No Meta/IG/TikTok/LinkedIn/YouTube APIs in MVP. Add one platform at a time post-MVP.
+8. WhatsApp + Facebook publish only: Remind Me + copy-pack per platform (WhatsApp: message + 1:1 image + wa.me CTA; Facebook: post text + image/link + Page/profile deep-link) + mark-posted. No auto-post APIs in MVP. Add other platforms one at a time post-MVP.
 9. Every phase must end in a usable $0 slice. If a task needs a banned tool, split it: ship manual/template version now, flag auto/paid version as upgrade.
 
 **Upgrade triggers (only then consider paid):**
@@ -36,7 +36,7 @@ Goal: extremely simple owner UX. Deliverable: tokens + shadcn components + 7-scr
 
 - Principles: 1 action/screen, defaults over config, plain language (“7 posts ready” not scores), mobile-first review.
 - IA: `/home /autopilot /create /schedule /customers /results /brand /onboarding` (same as PRD §28).
-- Onboarding 5 steps <3 min: Business → Audience → Preferences → WhatsApp-only (platform fixed, frequency + Remind Me) → Sales (WhatsApp default) + Dates.
+- Onboarding 5 steps <3 min: Business → Audience → Preferences → Platforms (WhatsApp + Facebook fixed, frequency + Remind Me) → Sales (WhatsApp default) + Dates.
 - Visual: neutral zinc/slate chrome, 1 accent (emerald/violet), Inter/Geist, 4pt grid, Lucide only. Brand colors only inside previews.
 - Components: shadcn base only + custom `PostPreviewCard, ReviewBatchHeader, FormatPicker, MissingInfoBanner, LeadCard, InsightCard, AttentionQueueItem, GuideMeInput` built from shadcn primitives.
 - States for every async view: skeleton → content → empty (with example) → error (retry). Review states: ready/regenerating/missing-info/failed.
@@ -58,7 +58,7 @@ No cost: Figma free / v0 free tier, no paid UI kits.
 | Data/Auth/Storage | Supabase Free (Postgres + Auth + Storage) | Paid tier only if limits hit |
 | DB access | Supabase JS client + raw SQL migrations | Add Prisma/Drizzle only when queries unmaintainable |
 | AI | `AIProvider` interface, free-first: Ollama local + Gemini Flash / Groq free (BYO free key) + deterministic template fallback | Plug OpenAI/Claude/Replicate behind same interface later |
-| Images/video | Template renderer (HTML/SVG/Canvas via satori/canvas, no API) + user uploads, WhatsApp 1:1 first | Add Replicate/Runway only if templates rejected |
+| Images/video | Template renderer (HTML/SVG/Canvas via satori/canvas, no API) + user uploads, WhatsApp 1:1 + Facebook sizes first | Add Replicate/Runway only if templates rejected |
 | Jobs/scheduling | DB status columns + Route Handlers + Vercel Cron free + manual triggers | Migrate to Inngest/Trigger when volume/SLA demands |
 | Observability | Vercel logs + `app_logs` table + health endpoint | Add Sentry/PostHog only when logs insufficient |
 | Tests | Vitest + Playwright (free, local + GH Actions free) | Same |
@@ -68,8 +68,8 @@ Monorepo (single repo, no Turborepo):
 /app                    # routes + /api/...
 /components/ui          # shadcn
 /components/custom      # preview/lead/insight cards
-/lib/ai                 # provider.ts, free-providers, planner, whatsapp adapter, memory, guards
-/lib/social             # whatsapp-only: copy-pack + remind-me + wa.me link helpers (no SDKs; other platforms post-MVP)
+/lib/ai                 # provider.ts, free-providers, planner, whatsapp + facebook adapters, memory, guards
+/lib/social             # whatsapp + facebook: copy-pack + remind-me + wa.me / Page deep-link helpers (no auto-post SDKs; other platforms post-MVP)
 /lib/scheduling         # time-picker heuristic (pure function)
 /lib/templates          # image/carousel/slideshow renderers
 /supabase/migrations    # SQL only
@@ -84,7 +84,7 @@ Monorepo (single repo, no Turborepo):
 export interface AIProvider {
   name: string; // 'ollama' | 'gemini-free' | 'groq-free' | 'template'
   plan(input: PlanInput): Promise<ContentIdea[]>;
-  generate(idea: ContentIdea, platform: 'whatsapp'): Promise<Variant>; // WhatsApp only; IG/FB/TikTok/YT/LinkedIn adapters post-MVP
+  generate(idea: ContentIdea, platform: 'whatsapp' | 'facebook'): Promise<Variant>; // WhatsApp + Facebook only; IG/TikTok/YT/LinkedIn adapters post-MVP
   reply(context: ReplyContext): Promise<{text: string; confidence: number}>;
   classifyLead(text: string): Promise<{isLead: boolean; score: number}>;
 }
@@ -93,7 +93,7 @@ export interface AIProvider {
 
 - Prompts in `/lib/ai/prompts/*.md`, zod-validated JSON, temps fixed (plan 0.7, generate 0.8).
 - Free-model policy: short outputs, JSON mode, retry once, then template fallback.
-- WhatsApp adapter rules (pure function): short message + hook first line + 1 CTA (wa.me link) + optional 1:1 image; Status-safe length; broadcast-friendly. Other platform adapters deferred.
+- WhatsApp adapter (pure function): short message + hook first line + 1 CTA (wa.me link) + optional 1:1 image; Status/broadcast-safe length. Facebook adapter (pure function): post text (hook + 2-4 lines + optional link) + image note, no hashtags spam. Other platform adapters deferred.
 - No business-fact invention: all facts from `verified_facts`; missing → `MissingInfoBanner`.
 
 ### 3.3 Data Model (Supabase SQL, no ORM)
@@ -106,8 +106,8 @@ media_assets (id uuid pk, business_id fk, url text, type text, tags text[]);
 verified_facts (business_id fk, key text, value text, source text);
 content_ideas (id uuid pk, business_id fk, topic text, angle text, format text, pillar text, event_ref text, status text);
 posts (id uuid pk, business_id fk, idea_id fk, status text, scheduled_at timestamptz);
-post_variants (post_id fk, platform text, caption text, hashtags text[], script text, media_url text, status text); -- MVP: platform='whatsapp' only
-content_history (business_id fk, topic text, angle text, hook text, format text, platform text, created_at timestamptz); -- MVP: 'whatsapp'
+post_variants (post_id fk, platform text, caption text, hashtags text[], script text, media_url text, status text); -- MVP: platform='whatsapp' | 'facebook' only
+content_history (business_id fk, topic text, angle text, hook text, format text, platform text, created_at timestamptz); -- MVP: 'whatsapp' | 'facebook'
 post_metrics (variant_row bigint fk, views int, reach int, likes int, comments int, shares int, clicks int, leads int, pulled_at timestamptz);
 learnings (business_id fk, insight_text text, confidence numeric, applied_count int);
 customers (business_id fk, handle text, platform text, interested_in text, context_json jsonb, status text);
@@ -122,7 +122,7 @@ app_logs (created_at timestamptz, level text, scope text, message text, meta jso
 
 ### 3.4 Scheduling Without Job Service
 
-- `lib/scheduling/pickTime.ts`: pure function (WhatsApp audience baseline, e.g. mornings/evenings WAT + history). No ML service.
+- `lib/scheduling/pickTime.ts`: pure function (WhatsApp + Facebook audience baseline, e.g. mornings/evenings WAT + history). No ML service.
 - Dispatch: `GET /api/cron/dispatch` checks due rows, marks published or creates Remind-Me task. Triggered by Vercel Cron free + “Run now” button. Idempotency key `post_id:platform`.
 - Follow-ups: same pattern, `follow_up_at` + max 2 + stop conditions.
 
@@ -140,7 +140,7 @@ app_logs (created_at timestamptz, level text, scope text, message text, meta jso
 
 ### Phase 3 — Onboarding/Profile/Brand/Media (Week 3-4)
 
-- [ ] 5-step wizard, drafts, completeness score. Defaults: WhatsApp fixed, Let AI decide frequency, Remind Me first; sales channel defaults to WhatsApp.
+- [ ] 5-step wizard, drafts, completeness score. Defaults: WhatsApp + Facebook fixed, Let AI decide frequency, Remind Me first; sales channel defaults to WhatsApp.
 - [ ] Brand editor + Media Library upload/tag/filter + Verified Facts editor.
 - [ ] Media rule (code, no AI): product post → suggest real photo; educational → template.
 - Exit: 5 test businesses onboarded. Zero paid AI calls.
@@ -148,12 +148,12 @@ app_logs (created_at timestamptz, level text, scope text, message text, meta jso
 ### Phase 4 — Content Engine, Free-AI Only (Week 5-7, highest risk)
 
 - [ ] `planner` via provider with template fallback; rotation value→engagement→story→promo, promo ≤40%.
-- [ ] Single WhatsApp adapter: short message + hook + 1 wa.me CTA + 1:1 image note. No IG/FB/TikTok/YT/LinkedIn adapters in MVP.
+- [ ] Two adapters only: WhatsApp (short message + hook + 1 wa.me CTA + 1:1 image note) and Facebook (post text + image/link note). No IG/TikTok/YT/LinkedIn in MVP.
 - [ ] Dedupe without vectors: normalized match + 30d window + rejected-history. UI “0 recent duplicates”.
 - [ ] `promo-guard`: code check vs `verified_facts`; missing → banner.
 - [ ] Events/trends stub: static holiday JSON + manual trend box + fit checklist (≥4/5).
 - [ ] Create Content mode reuses pipeline with prompt override.
-- Exit: 7 WhatsApp-ready drafts, no dupes, 20 adversarial promos invent nothing. Works with `AI_PROVIDER=template`.
+- Exit: 7 ideas × 2 platforms (WhatsApp + Facebook) drafts, no dupes, 20 adversarial promos invent nothing. Works with `AI_PROVIDER=template`.
 
 ### Phase 5 — Template Visuals (Week 8-9, $0)
 
@@ -164,10 +164,10 @@ app_logs (created_at timestamptz, level text, scope text, message text, meta jso
 
 ### Phase 6 — Review/Approve/Schedule/WhatsApp Remind-Me Publish (Week 10-11)
 
-- [ ] Review screen: batch header + Redo/AI-Edit/Manual/Reject + FormatPicker + Approve All. Preview card is WhatsApp-style (message bubble + 1:1 image + CTA button).
+- [ ] Review screen: batch header + Redo/AI-Edit/Manual/Reject + FormatPicker + Approve All. Preview cards: WhatsApp-style (message bubble + 1:1 image + CTA) and Facebook-style (post + image/link).
 - [ ] Scheduler: suggested time (pure function) editable; dispatch route + Cron + manual run.
-- [ ] Publish v1 = WhatsApp Remind Me + copy-pack (message + 1:1 image + wa.me link for Status/broadcast/direct) + mark-posted + manual metrics entry. No auto-post API in MVP.
-- Exit: plan → review → approve → reminded → posted to WhatsApp, no double-send on retry.
+- [ ] Publish v1 = Remind Me + copy-pack per platform (WhatsApp: message + 1:1 image + wa.me link for Status/broadcast/direct; Facebook: post text + image/link for Page/profile) + mark-posted + manual metrics entry. No auto-post API in MVP.
+- Exit: plan → review → approve → reminded → posted to WhatsApp + Facebook, no double-send on retry.
 
 ### Phase 7 — Results + Learning, Manual-First (Week 12-13)
 
@@ -177,7 +177,7 @@ app_logs (created_at timestamptz, level text, scope text, message text, meta jso
 
 ### Phase 8 — Comments/Leads/Follow-up, Safe + Manual (Week 14-15)
 
-- [ ] WhatsApp reply inbox (manual paste first): suggested reply one-tap copy; question → facts-only RAG; low-confidence → escalate, no auto-send. WhatsApp is both content and sales channel, so lead CTA is a native wa.me link.
+- [ ] WhatsApp reply inbox (manual paste first) + Facebook comment watcher (manual paste first): suggested reply one-tap copy; question → facts-only RAG; low-confidence → escalate, no auto-send. WhatsApp is content + sales channel (native wa.me link); Facebook routes to WhatsApp/website.
 - [ ] Lead classifier via provider or keyword fallback → card + WhatsApp CTA.
 - [ ] Follow-up queue: 24-72h, max 2, stop on purchase/opt-out/disable; manual send first.
 - [ ] Customer memory minimal, delete on request.
@@ -193,7 +193,7 @@ app_logs (created_at timestamptz, level text, scope text, message text, meta jso
 
 ### Phase 10 — Paid Upgrades (only on trigger, not now)
 
-Backlog: Instagram/Facebook/TikTok/YouTube/LinkedIn adapters + multi-platform variants, Replicate, Inngest, Prisma, PostHog/Sentry, paid AI, auto-publish APIs, pgvector, advanced CRM. Each needs written trigger + eval first.
+Backlog: Instagram/TikTok/YouTube/LinkedIn adapters + auto-post APIs (incl. Facebook Graph auto-post later), Replicate, Inngest, Prisma, PostHog/Sentry, paid AI, pgvector, advanced CRM. Each needs written trigger + eval first.
 
 ---
 
@@ -216,7 +216,7 @@ No workers; long renders run in-request with progress + retry.
 
 ## 6. Testing (free)
 
-Vitest + Playwright only. Pre-beta: 20 adversarial promos → zero inventions; 50 gens → zero 30d dupes; WhatsApp checks (short message, hook first, 1 wa.me CTA, 1:1 media); 30 templates rated; retry storm → 1 row; follow-ups ≤2; missing key → template fallback offline.
+Vitest + Playwright only. Pre-beta: 20 adversarial promos → zero inventions; 50 gens → zero 30d dupes; WhatsApp checks (short message, hook first, 1 wa.me CTA, 1:1 media) + Facebook checks (hook + concise post + image/link, no hashtag spam); 30 templates rated; retry storm → 1 row; follow-ups ≤2; missing key → template fallback offline.
 
 ---
 
@@ -228,7 +228,7 @@ Vitest + Playwright only. Pre-beta: 20 adversarial promos → zero inventions; 5
 
 ## 8. Metrics (no paid analytics)
 
-Supabase queries only: time-to-first-plan, Approve-All-clean %, edit rate, remind→posted-WhatsApp %, lead→WhatsApp CTR, opt-out %, “handled” ≥70%. Tech: p95 plan→ready, render p95, dispatch success %, cost = $0, usage <80% quota.
+Supabase queries only: time-to-first-plan, Approve-All-clean %, edit rate, remind→posted (WhatsApp + Facebook) %, lead→WhatsApp CTR, opt-out %, “handled” ≥70%. Tech: p95 plan→ready, render p95, dispatch success %, cost = $0, usage <80% quota.
 
 ---
 
@@ -236,5 +236,5 @@ Supabase queries only: time-to-first-plan, Approve-All-clean %, edit rate, remin
 
 1. Scaffold Next.js+TS+Tailwind+shadcn + Supabase free + SQL v1 + Auth.
 2. Build `AIProvider` + template provider; verify loop with no keys.
-3. Ship tokens + WhatsApp-style preview card + onboarding prototype (WhatsApp fixed).
+3. Ship tokens + WhatsApp + Facebook preview cards + onboarding prototype (both platforms fixed).
 4. Seed 2 businesses; run 20-prompt promo red-team on template provider.
