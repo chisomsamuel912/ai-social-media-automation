@@ -51,7 +51,7 @@ export default function AutopilotPage() {
         </div>
         {name && <p className="mt-2 text-center text-xs text-muted">Planning for {name} · WhatsApp + Facebook</p>}
         {msg && <p className="mt-2 text-center text-sm text-muted">{msg}</p>}
-        <div className="mt-4"><PlanResults ideas={ideas} blocked={blocked} /></div>
+        <div className="mt-4"><PlanResults ideas={ideas} blocked={blocked} businessName={name} /></div>
       </div>
     </main>
   );

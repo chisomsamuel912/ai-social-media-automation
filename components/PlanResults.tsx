@@ -1,9 +1,10 @@
 "use client";
 import type { PlannedIdea } from "@/lib/ai/engine";
+import VisualPreview from "./VisualPreview";
 
 const PLATFORM_ICON: Record<string, string> = { whatsapp: "💬", facebook: "📘", instagram: "📸", tiktok: "🎵" };
 
-export default function PlanResults({ ideas, blocked }: { ideas: PlannedIdea[]; blocked: number }) {
+export default function PlanResults({ ideas, blocked, businessName }: { ideas: PlannedIdea[]; blocked: number; businessName?: string }) {
   if (ideas.length === 0) return <p className="text-sm text-muted">No fresh ideas — everything matched recent history. Try a different guide.</p>;
   return (
     <div className="grid gap-3">
@@ -21,6 +22,7 @@ export default function PlanResults({ ideas, blocked }: { ideas: PlannedIdea[]; 
           </div>
           <p className="serif mt-2 text-xl">{idea.topic}</p>
           <p className="text-xs text-muted">angle: {idea.angle}</p>
+          <VisualPreview topic={idea.topic} angle={idea.angle} businessName={businessName} />
           {idea.needsInfo && (
             <div className="mt-3 rounded-xl p-3 text-sm" style={{ background: "#F5EAD3", border: "1px solid #D9C39A" }}>
               <b>Missing important information.</b> This promo makes concrete claims but no verified facts exist.{" "}
