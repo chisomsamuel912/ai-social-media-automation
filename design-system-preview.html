@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design System v4 — Editorial Premium (Fraunces + Inter)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{background:#F4F2ED;color:#2B2926;font-family:Inter,system-ui,sans-serif;font-size:14px}
+h1,h2,h3,.serif{font-family:Fraunces,Georgia,serif;letter-spacing:-.01em}
+.side{width:232px;background:#ECE9E2;border-right:1px solid #DDD8CC}
+.navitem{height:38px;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:10px;color:#6E675C;font-weight:500}
+.navitem.on{background:#FFFFFF;color:#2B2926;box-shadow:0 1px 2px rgba(60,50,30,.06)}
+.topbar{height:56px;background:rgba(244,242,237,.85);backdrop-filter:blur(10px);border-bottom:1px solid #DDD8CC}
+.card{background:#FBFAF7;border:1px solid #E3DED2;border-radius:14px;box-shadow:0 1px 2px rgba(60,50,30,.05)}
+.btn-p{background:#4A5D4E;color:#fff;font-weight:600;border-radius:10px;padding:9px 18px}
+.btn-g{background:#fff;border:1px solid #D8D2C4;border-radius:10px;padding:9px 14px;color:#4A443B}
+.badge{font-size:12px;padding:3px 11px;border-radius:999px;font-weight:500;border:1px solid}
+.search{background:#ECE9E2;border:1px solid #DDD8CC;border-radius:10px}
+.row{height:50px;border-bottom:1px solid #ECE7DA}
+.kbd{font-size:11px;border:1px solid #D8D2C4;border-radius:5px;padding:1px 7px;color:#8A8175;background:#fff}
+.num{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body class="flex min-h-screen">
+<aside class="side p-3 hidden md:flex flex-col gap-1 shrink-0">
+<div class="flex items-center gap-2 px-2 py-3"><div style="width:22px;height:22px;border-radius:7px;background:#4A5D4E"></div><b>Growpilot</b><span class="kbd ml-auto">⌘K</span></div>
+<div class="navitem on">🏠 Home <span class="ml-auto text-xs rounded-full px-2 py-0.5" style="background:#E8DCC8;color:#7A5C2E">3</span></div>
+<div class="navitem">🤖 Auto Pilot</div><div class="navitem">✨ Create</div><div class="navitem">📅 Schedule</div>
+<div class="navitem">💬 Customers <span class="ml-auto text-xs rounded-full px-2 py-0.5" style="background:#DCE5DB;color:#42563F">2 new</span></div>
+<div class="navitem">📊 Results</div><div class="navitem">🎨 Brand</div>
+<div class="mt-auto text-xs px-2" style="color:#8A8175">Soft smooth · muted · calm<br>warm paper, no harsh black</div>
+</aside>
+<main class="flex-1 min-w-0">
+<div class="topbar flex items-center gap-3 px-5 sticky top-0 z-10">
+<div class="search flex items-center gap-2 px-3 py-2 text-sm flex-1 max-w-md" style="color:#8A8175">🔍 Search plans, customers… <span class="kbd ml-auto">⌘ K</span></div>
+<span class="text-sm num hidden sm:inline" style="color:#6E675C">AI cost <b style="color:#2B2926">$0.00</b></span>
+<button class="btn-p ml-auto">Approve All</button>
+<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#9CAF88,#D9CFC0)"></div>
+</div>
+<div class="p-5 grid gap-4" style="max-width:1150px">
+<div class="card p-5">
+<h2 class="font-semibold">What needs your attention?</h2>
+<div class="mt-2 text-sm">
+<div class="row flex items-center gap-3"><span class="badge" style="color:#7A5C2E;border-color:#D9C39A;background:#F5EAD3">needs info</span><span><b>Package post</b> — missing price + inclusions</span><button class="btn-g ml-auto text-xs">Add details</button></div>
+<div class="row flex items-center gap-3"><span class="badge" style="color:#42563F;border-color:#B9C9B6;background:#E3EBE1">new lead</span><span>Sarah — “black sneakers, size 40, how much?” → WhatsApp</span><button class="btn-p ml-auto text-xs">Send link</button></div>
+<div class="row flex items-center gap-3" style="border:0"><span class="badge" style="color:#5A6B7A;border-color:#BCC9D4;background:#E4EAF0">scheduled</span><span class="num">7 posts · 3 platforms · Fri 18:30 · 0 duplicates</span><button class="btn-g ml-auto text-xs">Review</button></div>
+</div>
+</div>
+<div class="grid lg:grid-cols-3 gap-4">
+<div class="card p-5 lg:col-span-2">
+<h3 class="font-semibold">Auto Pilot — this week <span class="text-xs font-normal" style="color:#8A8175">Guide: “focus on saving”</span></h3>
+<table class="w-full mt-2 text-sm"><thead class="text-xs" style="color:#8A8175"><tr class="text-left"><th class="py-2">Topic × angle</th><th>Format</th><th>Pillar</th><th class="text-right">Fit</th></tr></thead>
+<tbody class="num">
+<tr class="row"><td>3 saving mistakes <span style="color:#8A8175">· myth-bust</span></td><td>Carousel</td><td>value</td><td class="text-right">4.8</td></tr>
+<tr class="row"><td>₦5k weekly challenge <span style="color:#8A8175">· story</span></td><td>Short video</td><td>engage</td><td class="text-right">4.6</td></tr>
+<tr style="height:50px"><td>New sneakers <span style="color:#8A8175">· drop</span></td><td>Image</td><td>promo</td><td class="text-right" style="color:#7A5C2E">gated</td></tr>
+</tbody></table>
+</div>
+<div class="card p-5">
+<h3 class="font-semibold">What AI learned</h3>
+<div class="mt-3 p-3 rounded-xl text-sm" style="background:#EFF0E8;border:1px solid #DDE0D2">🌱 Educational video <b class="num">+32%</b> engagement<br><span style="color:#6E675C">Will plan 3 instead of 1 next week.</span></div>
+<div class="flex items-end gap-1.5 mt-3" style="height:64px"><div style="width:100%;height:30%;background:#DDD8CC;border-radius:5px"></div><div style="width:100%;height:45%;background:#DDD8CC;border-radius:5px"></div><div style="width:100%;height:58%;background:#B9C4B1;border-radius:5px"></div><div style="width:100%;height:75%;background:#8A9B84;border-radius:5px"></div><div style="width:100%;height:92%;background:#4A5D4E;border-radius:5px"></div></div>
+</div>
+</div>
+<div class="grid md:grid-cols-3 gap-4">
+<div class="card overflow-hidden"><div class="px-4 py-2.5 text-sm font-medium border-b" style="border-color:#E3DED2">📸 Instagram</div>
+<div class="p-5" style="background:linear-gradient(135deg,#EDEAE0,#E0D9C8)"><p class="font-bold text-lg">3 mistakes when saving</p><p class="text-xs" style="color:#6E675C">Template · soft beige · logo ↓</p></div>
+<div class="p-4 text-sm" style="color:#4A443B">Save first, spend the rest. Checklist 👇<p class="text-xs mt-1" style="color:#8A8175">Today 18:30 · Image</p></div></div>
+<div class="card overflow-hidden"><div class="px-4 py-2.5 text-sm font-medium border-b" style="border-color:#E3DED2">🎵 TikTok</div>
+<div class="p-5" style="background:#ECE9E2"><p class="font-bold text-lg">POV: you saved ₦5k weekly</p><p class="text-xs" style="color:#6E675C">Hook 0–2s · 20s · captions on</p></div>
+<div class="p-4 text-sm" style="color:#4A443B">Script + slideshow template<p class="text-xs mt-1" style="color:#8A8175">Fri 19:00 · Short video</p></div></div>
+<div class="card overflow-hidden"><div class="px-4 py-2.5 text-sm font-medium border-b" style="border-color:#E3DED2">💼 LinkedIn</div>
+<div class="p-4 text-sm"><b>New package?</b> Paused — price unknown.<div class="flex gap-2 mt-3"><button class="btn-p text-xs">Add details</button><button class="btn-g text-xs">Skip</button></div></div></div>
+</div>
+<div class="card p-5">
+<h3 class="font-semibold">Palette — smooth, muted, never bright</h3>
+<div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-3 text-xs">
+<div class="p-3 rounded-xl" style="background:#F4F2ED;border:1px solid #E3DED2">paper #F4F2ED</div>
+<div class="p-3 rounded-xl" style="background:#FBFAF7;border:1px solid #E3DED2">card #FBFAF7</div>
+<div class="p-3 rounded-xl" style="background:#ECE9E2;border:1px solid #DDD8CC">sand #ECE9E2</div>
+<div class="p-3 rounded-xl text-white" style="background:#4A5D4E">moss #4A5D4E</div>
+<div class="p-3 rounded-xl" style="background:#E4EAF0;border:1px solid #BCC9D4">mist blue</div>
+</div>
+<p class="text-xs mt-2" style="color:#8A8175">Warm paper base · moss primary · sand sidebar · radius 10–14 · soft 1px borders · no pure black, no neon.</p>
+</div>
+</div>
+</main>
+</body></html>

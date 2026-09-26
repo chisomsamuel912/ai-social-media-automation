@@ -30,14 +30,16 @@ Replicate → users reject template visuals in testing; Inngest/Trigger → Verc
 
 ---
 
-## 2. Phase 0 — Design System ($0, no new deps)
+## 2. Phase 0 — Design System v2: Sleek Dark Pro (2026, $0, no new deps)
 
-Goal: extremely simple owner UX. Deliverable: tokens + shadcn components + 7-screen wireframes + clickable onboarding prototype.
+Goal: calm, mature, premium tool for non-expert owners. Soft muted palette, never harsh black or neon. Direction locked per user: **soft smooth light, muted moss + warm paper**.
+Deliverable: soft tokens + shadcn light components + app-shell mock (`design-system-preview.html`) + 7-screen wireframes.
 
 - Principles: 1 action/screen, defaults over config, plain language (“7 posts ready” not scores), mobile-first review.
 - IA: `/home /autopilot /create /schedule /customers /results /brand /onboarding` (same as PRD §28).
 - Onboarding 5 steps <3 min: Business → Audience → Preferences → Platforms (WhatsApp + Facebook fixed, frequency + Remind Me) → Sales (WhatsApp default) + Dates.
-- Visual: neutral zinc/slate chrome, 1 accent (emerald/violet), Inter/Geist, 4pt grid, Lucide only. Brand colors only inside previews.
+- Visual: soft light theme — paper #F4F2ED, card #FBFAF7, sand #ECE9E2, moss #4A5D4E (no black, no neon).
+- Type: editorial premium — Fraunces serif headings, Inter body 14px, tabular-nums. Radius 10–14, soft 1px borders #E3DED2. Brand colors only inside previews.
 - Components: shadcn base only + custom `PostPreviewCard, ReviewBatchHeader, FormatPicker, MissingInfoBanner, LeadCard, InsightCard, AttentionQueueItem, GuideMeInput` built from shadcn primitives.
 - States for every async view: skeleton → content → empty (with example) → error (retry). Review states: ready/regenerating/missing-info/failed.
 - A11y: AA contrast, keyboard review actions, aria-live progress, alt text required.
