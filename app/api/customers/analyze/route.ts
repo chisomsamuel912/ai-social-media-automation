@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServiceClient, isSupabaseConfigured } from "@/lib/supabase";
+import { audit, tooMany } from "@/lib/audit";
+import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { classifyLead, suggestReply, type Fact } from "@/lib/customers";
 
 const Body = z.object({
@@ -14,6 +16,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "invalid-body" }, { status: 400 });
+  if (!rateLimit(`analyze:${clientKey(req)}`, 20, 60_000)) return tooMany("Analysis is throttled");
   const { businessId, handle, platform, comment, facts } = parsed.data;
 
   let known: Fact[] = facts ?? [];
@@ -25,6 +28,7 @@ export async function POST(req: Request) {
 
   const lead = classifyLead(comment);
   const reply = suggestReply(comment, known);
+  if (lead.isLead) await audit("analyze", `lead ${lead.score} from ${handle || "anon"}`, { businessId: businessId ?? "device" });
 
   let storedId: string | null = null;
   if (businessId && isSupabaseConfigured()) {

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServiceClient, isSupabaseConfigured } from "@/lib/supabase";
+import { audit, tooMany } from "@/lib/audit";
+import { clientKey, dailyQuota, rateLimit } from "@/lib/ratelimit";
 import { planContent } from "@/lib/ai/engine";
 
 const Body = z.object({
@@ -12,6 +14,11 @@ const Body = z.object({
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "invalid-body" }, { status: 400 });
+  if (!rateLimit(`plan:${clientKey(req)}`, 10, 60_000)) return tooMany("Planning is throttled");
+  const quota = dailyQuota(`plans:${clientKey(req)}`, 20);
+  if (!quota.ok) {
+    return NextResponse.json({ error: "daily-quota", hint: `20 plans/day used. Back tomorrow.` }, { status: 429 });
+  }
   const { businessId, guide, count } = parsed.data;
 
   let businessName = "My Business";
@@ -42,6 +49,7 @@ export async function POST(req: Request) {
   }
 
   const result = await planContent({ businessName, guide, count, salesChannel, historyKeys, factCount, boosts });
+  await audit("plan", `planned ${result.ideas.length} ideas`, { businessId: businessId ?? "device" });
 
   if (businessId && isSupabaseConfigured()) {
     const db = getServiceClient();

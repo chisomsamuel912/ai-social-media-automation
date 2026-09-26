@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServiceClient, isSupabaseConfigured } from "@/lib/supabase";
+import { audit, tooMany } from "@/lib/audit";
+import { clientKey, rateLimit } from "@/lib/ratelimit";
 
 const Body = z.object({
   name: z.string().min(2),
@@ -19,6 +21,7 @@ const Body = z.object({
 });
 
 export async function POST(req: Request) {
+  if (!rateLimit(`onboarding:${clientKey(req)}`, 5, 60_000)) return tooMany("Onboarding is throttled");
   if (!isSupabaseConfigured()) {
     return NextResponse.json(
       { error: "supabase-not-configured", hint: "Add Supabase keys to .env, then retry." },
@@ -56,5 +59,6 @@ export async function POST(req: Request) {
     goals: csv(b.goals)
   });
   await db.from("brands").insert({ business_id: biz.id });
+  await audit("onboarding", "business created", { businessId: biz.id });
   return NextResponse.json({ ok: true, businessId: biz.id });
 }

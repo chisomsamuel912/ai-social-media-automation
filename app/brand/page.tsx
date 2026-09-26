@@ -51,6 +51,24 @@ export default function BrandPage() {
     else setMsg("Could not save — Supabase keys missing?");
   }
 
+  async function deleteEverything() {
+    if (!confirm("Permanently delete this business and everything attached, on this device and online?")) return;
+    if (!confirm("Last check — really delete everything?")) return;
+    await fetch("/api/account", {
+      method: "DELETE", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ businessId, confirm: "delete-everything" })
+    }).catch(() => {});
+    try {
+      for (const k of ["business-id", "onboarding-draft", "schedule-queue", "device-metrics", "customer-inbox"]) {
+        localStorage.removeItem(k);
+      }
+    } catch {}
+    setBusinessId("");
+    setFacts([]);
+    setAssets([]);
+    setMsg("Everything deleted. Fresh start — see you at onboarding.");
+  }
+
   return (
     <main className="stage px-4 py-10">
       <div className="orb" style={{ width: 400, height: 400, right: "-120px", top: "-100px", background: "#D9CFC0" }} />
@@ -101,6 +119,14 @@ export default function BrandPage() {
               <p className="text-xs text-muted">Rule: promo posts prefer your real photo; educational posts use a template.</p>
             </div>
           )}
+        </div>
+
+        <div className="glass mt-6 p-5">
+          <p className="font-semibold">Danger zone</p>
+          <p className="text-xs text-muted">Permanently removes your business, facts, media, metrics, and inbox — online and on this device.</p>
+          <button onClick={deleteEverything} className="mt-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2 text-sm text-red-700">
+            Delete my data
+          </button>
         </div>
       </div>
     </main>

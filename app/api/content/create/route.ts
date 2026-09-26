@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServiceClient, isSupabaseConfigured } from "@/lib/supabase";
+import { tooMany } from "@/lib/audit";
+import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { planContent } from "@/lib/ai/engine";
 
 const Body = z.object({
@@ -11,6 +13,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "invalid-body" }, { status: 400 });
+  if (!rateLimit(`create:${clientKey(req)}`, 10, 60_000)) return tooMany("Creating is throttled");
   const { businessId, prompt } = parsed.data;
 
   let businessName = "My Business";

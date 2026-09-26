@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServiceClient, isSupabaseConfigured } from "@/lib/supabase";
+import { tooMany } from "@/lib/audit";
+import { clientKey, rateLimit } from "@/lib/ratelimit";
 import { analyze, type MetricRow } from "@/lib/learner";
 
 const Body = z.object({
@@ -17,6 +19,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "invalid-body" }, { status: 400 });
+  if (!rateLimit(`learn:${clientKey(req)}`, 10, 60_000)) return tooMany("Learning is throttled");
   const { businessId, rows } = parsed.data;
 
   let data: MetricRow[] = rows ?? [];
