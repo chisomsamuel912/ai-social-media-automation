@@ -4,7 +4,7 @@ const sections = [
   { href: "/autopilot", icon: "🤖", label: "Auto Pilot", desc: "Current plan + Guide Me · live", live: true },
   { href: "/create", icon: "✨", label: "Create", desc: "Freeform prompt → preview · live", live: true },
   { href: "/schedule", icon: "📅", label: "Schedule", desc: "Upcoming + reschedule · live", live: true },
-  { href: "/customers", icon: "💬", label: "Customers", desc: "Comments, leads, follow-ups", live: false },
+  { href: "/customers", icon: "💬", label: "Customers", desc: "Comments, leads, follow-ups · live", live: true },
   { href: "/results", icon: "📊", label: "Results", desc: "Metrics + AI learnings · live", live: true }
 ];
 
