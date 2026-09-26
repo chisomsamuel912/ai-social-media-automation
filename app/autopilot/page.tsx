@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import PlanResults from "@/components/PlanResults";
 import type { PlannedIdea } from "@/lib/ai/engine";
+import { fitScore, upcomingHolidays } from "@/lib/trends";
 
 export default function AutopilotPage() {
   const [businessId, setBusinessId] = useState("");
@@ -11,6 +12,9 @@ export default function AutopilotPage() {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  const [trend, setTrend] = useState("");
+  const [checks, setChecks] = useState({ niche: false, audience: false, brand: false, timely: false });
+  const holidays = upcomingHolidays();
 
   useEffect(() => {
     try {
@@ -51,6 +55,29 @@ export default function AutopilotPage() {
         </div>
         {name && <p className="mt-2 text-center text-xs text-muted">Planning for {name} · WhatsApp + Facebook</p>}
         {msg && <p className="mt-2 text-center text-sm text-muted">{msg}</p>}
+
+        <div className="glass-soft mt-3 p-4 text-sm">
+          <p className="font-semibold">📅 Ride a trend or holiday? <span className="font-normal text-muted">Only if it fits — score ≥ 4/5</span></p>
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+            <input className="field !border-0 !bg-white/70" value={trend} onChange={(e) => setTrend(e.target.value)}
+              placeholder='e.g. "Independence Day promo"' />
+            <button className="btn-ghost shrink-0 !py-2 text-xs" onClick={() => {
+              const s = fitScore(checks);
+              if (s >= 4 && trend.trim()) { setGuide((g) => `${g} [Trend: ${trend.trim()}]`.trim()); setMsg(`Trend accepted (${s}/5) — added to your guide ✓`); }
+              else setMsg(`Trend skipped (${s}/5) — needs 4+. It doesn't fit, so the AI will ignore it.`);
+            }}>Check fit</button>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {(Object.keys(checks) as Array<keyof typeof checks>).map((k) => (
+              <button key={k} onClick={() => setChecks((c) => ({ ...c, [k]: !c[k] }))}
+                className={`pill ${checks[k] ? "on" : ""}`}>{checks[k] ? "✓ " : ""}fits {k}</button>
+            ))}
+          </div>
+          {holidays.length > 0 && (
+            <p className="mt-2 text-xs text-muted">Coming up: {holidays.slice(0, 3).map((h) => `${h.name} (${h.date})`).join(" · ")}</p>
+          )}
+        </div>
+
         <div className="mt-4"><PlanResults ideas={ideas} blocked={blocked} businessName={name} /></div>
       </div>
     </main>

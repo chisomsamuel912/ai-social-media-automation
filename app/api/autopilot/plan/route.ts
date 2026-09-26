@@ -18,6 +18,7 @@ export async function POST(req: Request) {
   let salesChannel = "whatsapp";
   let historyKeys: string[] = [];
   let factCount = 0;
+  const boosts: Record<string, number> = {};
 
   if (businessId && isSupabaseConfigured()) {
     const db = getServiceClient();
@@ -33,9 +34,14 @@ export async function POST(req: Request) {
       `${h.topic} ${h.angle}`.toLowerCase().replace(/[^a-z0-9\s₦]/g, "").replace(/\s+/g, " ").trim());
     const facts = await db!.from("verified_facts").select("key", { count: "exact", head: true }).eq("business_id", businessId);
     factCount = facts.count ?? 0;
+    const learned = await db!.from("learnings").select("insight_text").eq("business_id", businessId).limit(20);
+    for (const row of (learned.data ?? []) as Array<{ insight_text: string }>) {
+      const m = row.insight_text.match(/^boost:(.+?) —/);
+      if (m) boosts[m[1]] = (boosts[m[1]] ?? 0) + 1;
+    }
   }
 
-  const result = await planContent({ businessName, guide, count, salesChannel, historyKeys, factCount });
+  const result = await planContent({ businessName, guide, count, salesChannel, historyKeys, factCount, boosts });
 
   if (businessId && isSupabaseConfigured()) {
     const db = getServiceClient();

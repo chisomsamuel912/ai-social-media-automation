@@ -51,16 +51,21 @@ export default function SchedulePage() {
 
   async function saveMetrics(item: QueueItem) {
     const m = metrics[item.key] ?? { views: "", likes: "", comments: "" };
+    const payload = {
+      businessId: businessId || undefined,
+      platform: item.platform,
+      caption: item.caption,
+      views: Number(m.views) || 0,
+      likes: Number(m.likes) || 0,
+      comments: Number(m.comments) || 0
+    };
+    try {
+      const dev = JSON.parse(localStorage.getItem("device-metrics") ?? "[]");
+      localStorage.setItem("device-metrics", JSON.stringify([...dev, { ...payload, format: "Image" }]));
+    } catch {}
     const res = await fetch("/api/metrics/import", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        businessId: businessId || undefined,
-        platform: item.platform,
-        caption: item.caption,
-        views: Number(m.views) || 0,
-        likes: Number(m.likes) || 0,
-        comments: Number(m.comments) || 0
-      })
+      body: JSON.stringify(payload)
     });
     const body = await res.json().catch(() => ({}));
     setMsg(body.stored ? "Metrics stored ✓" : "Metrics noted on-device (Supabase offline).");
