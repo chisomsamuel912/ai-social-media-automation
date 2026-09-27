@@ -50,18 +50,13 @@ export default function PlanResults({ ideas, blocked, businessName }: { ideas: P
       )}
       {ideas.map((idea, i) => (
         <div key={i} className="glass lift p-5">
-          <div className="flex items-center gap-2">
-            <span className="pill">{idea.format}</span>
-            <span className="pill">{idea.pillar}</span>
-            {idea.needsInfo && <span className="pill" style={{ background: "#F5EAD3", color: "#7A5C2E", borderColor: "#D9C39A" }}>⚠ missing facts</span>}
-          </div>
-          <p className="serif mt-2 text-xl">{idea.topic}</p>
-          <p className="text-xs text-muted">angle: {idea.angle}</p>
+          <p className="serif mt-1 text-xl">{idea.topic}</p>
+          <p className="text-xs text-muted">Why this post: {idea.angle} · Style: {idea.format}</p>
           <VisualPreview topic={idea.topic} angle={idea.angle} businessName={businessName} />
           {idea.needsInfo && (
             <div className="mt-3 rounded-xl p-3 text-sm" style={{ background: "#F5EAD3", border: "1px solid #D9C39A" }}>
-              <b>Missing important information.</b> This promo makes concrete claims but no verified facts exist.{" "}
-              <a href="/brand" className="underline">Add details in Brand</a> — the AI won&apos;t invent them.
+              <b>Heads up — a price is missing.</b> This post talks about an offer but you haven&apos;t told the AI the price yet.{" "}
+              <a href="/brand" className="underline">Add it here</a> — the AI won&apos;t guess.
             </div>
           )}
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -76,7 +71,7 @@ export default function PlanResults({ ideas, blocked, businessName }: { ideas: P
         </div>
       ))}
       <button onClick={approveAll} className="btn-primary w-full py-3 text-base">
-        Approve All & Schedule →
+        Looks good — schedule these →
       </button>
     </div>
   );

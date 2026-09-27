@@ -46,37 +46,37 @@ export default function AutopilotPage() {
       <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#9CAF88" }} />
       <div className="orb orb-b" style={{ width: 440, height: 440, right: "-140px", top: "30%", background: "#D9CFC0" }} />
       <div className="relative mx-auto max-w-2xl">
-        <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">Auto Pilot · You handle direction</p>
-        <h1 className="grad-text mt-1 text-center text-4xl">Your content plan</h1>
+        <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">Step 1 · Tell the AI what matters</p>
+        <h1 className="grad-text mt-1 text-center text-4xl">What should we post?</h1>
         <div className="glass mt-6 flex flex-col gap-2 p-2.5 sm:flex-row">
           <input className="field !border-0 !bg-transparent" value={guide} onChange={(e) => setGuide(e.target.value)}
-            placeholder='Guide Me… e.g. "Focus more on saving this week"' />
-          <button onClick={run} disabled={busy} className="btn-primary shrink-0">{busy ? "Planning…" : "✨ Generate"}</button>
+            placeholder='Optional: "more about saving this week" — or leave empty' />
+          <button onClick={run} disabled={busy} className="btn-primary shrink-0">{busy ? "Thinking…" : "✨ Make my plan"}</button>
         </div>
         {name && <p className="mt-2 text-center text-xs text-muted">Planning for {name} · WhatsApp + Facebook</p>}
         {msg && <p className="mt-2 text-center text-sm text-muted">{msg}</p>}
 
-        <div className="glass-soft mt-3 p-4 text-sm">
-          <p className="font-semibold">📅 Ride a trend or holiday? <span className="font-normal text-muted">Only if it fits — score ≥ 4/5</span></p>
+        <details className="glass-soft mt-3 p-4 text-sm">
+          <summary className="cursor-pointer font-semibold">📅 Holiday or trend to ride? (optional)</summary>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row">
             <input className="field !border-0 !bg-white/70" value={trend} onChange={(e) => setTrend(e.target.value)}
               placeholder='e.g. "Independence Day promo"' />
             <button className="btn-ghost shrink-0 !py-2 text-xs" onClick={() => {
               const s = fitScore(checks);
-              if (s >= 4 && trend.trim()) { setGuide((g) => `${g} [Trend: ${trend.trim()}]`.trim()); setMsg(`Trend accepted (${s}/5) — added to your guide ✓`); }
-              else setMsg(`Trend skipped (${s}/5) — needs 4+. It doesn't fit, so the AI will ignore it.`);
-            }}>Check fit</button>
+              if (s >= 4 && trend.trim()) { setGuide((g) => `${g} [Trend: ${trend.trim()}]`.trim()); setMsg(`Nice — "${trend.trim()}" fits your business, added ✓`); }
+              else setMsg(`Skipped — that doesn't fit your business, so the AI will ignore it.`);
+            }}>Check if it fits</button>
           </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {(Object.keys(checks) as Array<keyof typeof checks>).map((k) => (
               <button key={k} onClick={() => setChecks((c) => ({ ...c, [k]: !c[k] }))}
-                className={`pill ${checks[k] ? "on" : ""}`}>{checks[k] ? "✓ " : ""}fits {k}</button>
+                className={`pill ${checks[k] ? "on" : ""}`}>{checks[k] ? "✓ " : ""}fits my {k === "timely" ? "timing" : k === "niche" ? "business" : k}</button>
             ))}
           </div>
           {holidays.length > 0 && (
             <p className="mt-2 text-xs text-muted">Coming up: {holidays.slice(0, 3).map((h) => `${h.name} (${h.date})`).join(" · ")}</p>
           )}
-        </div>
+        </details>
 
         <div className="mt-4"><PlanResults ideas={ideas} blocked={blocked} businessName={name} /></div>
       </div>

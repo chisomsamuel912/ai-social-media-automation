@@ -107,9 +107,9 @@ export default function SchedulePage() {
                 <p className="whitespace-pre-line text-sm text-muted">{item.caption}</p>
                 <div className="mt-3 flex gap-2">
                   <button onClick={() => copyPack(item)} className="btn-ghost !py-1.5 text-xs">
-                    {copied === item.key ? "Copied ✓" : "📋 Copy pack"}
+                    {copied === item.key ? "Copied ✓" : "📋 Copy post text"}
                   </button>
-                  <button onClick={() => markPublished(item.key)} className="btn-primary !py-1.5 text-xs">Mark published ✓</button>
+                  <button onClick={() => markPublished(item.key)} className="btn-primary !py-1.5 text-xs">I posted it ✓</button>
                 </div>
               </div>
             );

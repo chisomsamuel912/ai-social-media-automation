@@ -7,13 +7,13 @@ import { loadQueue } from "@/components/PlanResults";
 import { followUpDue } from "@/lib/customers";
 
 const sections = [
-  { href: "/onboarding", icon: "📝", label: "Onboarding", desc: "5-step setup · live", live: true },
-  { href: "/brand", icon: "🎨", label: "Brand", desc: "Identity, media, facts · live", live: true },
-  { href: "/autopilot", icon: "🤖", label: "Auto Pilot", desc: "Current plan + Guide Me · live", live: true },
-  { href: "/create", icon: "✨", label: "Create", desc: "Freeform prompt → preview · live", live: true },
-  { href: "/schedule", icon: "📅", label: "Schedule", desc: "Upcoming + reschedule · live", live: true },
-  { href: "/customers", icon: "💬", label: "Customers", desc: "Comments, leads, follow-ups · live", live: true },
-  { href: "/results", icon: "📊", label: "Results", desc: "Metrics + AI learnings · live", live: true }
+  { href: "/onboarding", icon: "📝", label: "Setup", desc: "Tell the AI about your business", live: true },
+  { href: "/brand", icon: "🎨", label: "My business", desc: "Prices, photos, facts", live: true },
+  { href: "/autopilot", icon: "🤖", label: "Get posts", desc: "Weekly posts, made for you", live: true },
+  { href: "/create", icon: "✨", label: "Special post", desc: "One post about something new", live: true },
+  { href: "/schedule", icon: "📅", label: "My posts", desc: "What to post and when", live: true },
+  { href: "/customers", icon: "💬", label: "Messages", desc: "Replies and customers", live: true },
+  { href: "/results", icon: "📊", label: "Growth", desc: "What works, what to do more", live: true }
 ];
 
 interface Attention {
@@ -22,10 +22,25 @@ interface Attention {
   tone: string;
 }
 
+function LoopStep({ n, title, desc, href, done }: { n: string; title: string; desc: string; href: string; done: boolean }) {
+  return (
+    <a href={href} className="glass-soft lift block p-4">
+      <p className="flex items-center gap-2 font-semibold">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-white" style={{ background: done ? "#4A5D4E" : "#B9B2A4" }}>
+          {done ? "✓" : n}
+        </span>
+        {title}
+      </p>
+      <p className="mt-1 text-xs text-muted">{desc}</p>
+    </a>
+  );
+}
+
 export default function Page() {
   const { user, ready } = useAuth();
   const router = useRouter();
   const [attention, setAttention] = useState<Attention[]>([]);
+  const [loopState, setLoopState] = useState({ setup: false, planned: false, posted: false, grew: false });
   const [feedback, setFeedback] = useState("");
   const [thanks, setThanks] = useState(false);
 
@@ -41,6 +56,18 @@ export default function Page() {
         list.push({ label: "Finish setup — 3 minutes, then the AI can plan for you", href: "/onboarding", tone: "amber" });
       }
       const queue = loadQueue();
+      setLoopState({
+        setup: hasBusiness,
+        planned: queue.length > 0,
+        posted: queue.some((q) => q.status === "published"),
+        grew: (() => {
+          try {
+            return (JSON.parse(localStorage.getItem("device-metrics") ?? "[]") as unknown[]).length > 0;
+          } catch {
+            return false;
+          }
+        })()
+      });
       const due = queue.filter((q) => q.status === "scheduled" && new Date(q.scheduledAt).getTime() <= Date.now());
       if (due.length > 0) list.push({ label: `⏰ ${due.length} post${due.length > 1 ? "s" : ""} due — time to publish`, href: "/schedule", tone: "amber" });
       const inbox = JSON.parse(localStorage.getItem("customer-inbox") ?? "[]") as Array<{
@@ -88,6 +115,16 @@ export default function Page() {
         <p className="text-sm text-muted">Phase 9 · $0 MVP · all systems live</p>
         <h1 className="grad-text mt-2 text-5xl">Growpilot</h1>
         <p className="mt-2 max-w-xl text-muted">Give the AI direction once. Let it handle the content work.</p>
+
+        <div className="glass mt-6 p-5">
+          <p className="font-semibold">How it works — the loop that runs your socials</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-4">
+            <LoopStep n="1" title="Tell it once" desc="Your business, your voice" href="/onboarding" done={loopState.setup} />
+            <LoopStep n="2" title="Get posts" desc="Text + pictures, made for you" href="/autopilot" done={loopState.planned} />
+            <LoopStep n="3" title="Post" desc="Copy, paste, done" href="/schedule" done={loopState.posted} />
+            <LoopStep n="4" title="Grow" desc="See what works, AI learns" href="/results" done={loopState.grew} />
+          </div>
+        </div>
 
         <div className="glass mt-6 p-5">
           <p className="font-semibold">What needs your attention?</p>
