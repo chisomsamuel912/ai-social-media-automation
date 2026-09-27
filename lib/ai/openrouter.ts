@@ -1,7 +1,7 @@
 import { templateProvider, type AIProvider, type ContentIdea, type Platform, type Variant } from "./provider";
 
 const API = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = process.env.OPENROUTER_MODEL ?? "meta-llama/llama-3.1-8b-instruct:free";
+const MODEL = process.env.OPENROUTER_MODEL ?? "google/gemma-4-31b-it:free";
 const PILLARS = ["value", "engagement", "story", "promo"] as const;
 
 /** Pull a JSON array out of fenced or raw model output. Throws on garbage. */
