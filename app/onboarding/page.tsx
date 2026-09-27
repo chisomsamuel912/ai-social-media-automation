@@ -20,6 +20,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<string>("");
   const [doneId, setDoneId] = useState<string>("");
+  const [quick, setQuick] = useState(true);
 
   useEffect(() => {
     try {
@@ -65,14 +66,64 @@ export default function OnboardingPage() {
         <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#9CAF88" }} />
         <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", bottom: "-160px", background: "#D9CFC0" }} />
         <div className="glass relative max-w-lg w-full p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg,#55705a,#3c4f40)" }}>🎉</div>
-          <h1 className="grad-text mt-4 text-4xl">You&apos;re set</h1>
-          <p className="mt-2 text-sm text-muted">The AI now understands your business. Let&apos;s make your first posts.</p>
-          <p className="mt-2 font-mono text-xs text-muted">{doneId}</p>
-          <div className="mt-6 flex flex-col justify-center gap-2">
-            <a href="/autopilot" className="btn-primary">See my first posts →</a>
-            <a href="/brand" className="btn-ghost text-sm">Add prices & photos first (recommended)</a>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg,#55705a,#3c4f40)" }}>🤖</div>
+          <h1 className="grad-text mt-4 text-4xl">Got it — my turn</h1>
+          <p className="mt-2 text-sm text-muted">I&apos;m making your first posts now. This takes a few seconds.</p>
+          <div className="mt-6">
+            <a href="/autopilot?auto=1" className="btn-primary">Watch them appear →</a>
           </div>
+        </div>
+      </main>
+    );
+  }
+
+  async function quickStart() {
+    if (draft.name.trim().length < 2 || draft.description.trim().length < 10) {
+      setStatus("Just two things: your business name and one line about what you do.");
+      return;
+    }
+    setStatus("Saving…");
+    const res = await fetch("/api/onboarding", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...draft, ownerId: user?.id })
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.ok) {
+      setDoneId(body.businessId);
+      try {
+        localStorage.setItem("business-id", body.businessId);
+        localStorage.removeItem("onboarding-draft");
+      } catch {}
+      setStatus("");
+    } else {
+      setStatus(body.error === "supabase-not-configured"
+        ? "Supabase keys missing — add them to .env, then retry."
+        : `Error: ${body.error ?? res.status}`);
+    }
+  }
+
+  if (quick) {
+    return (
+      <main className="stage flex items-center justify-center px-4 py-14">
+        <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#9CAF88" }} />
+        <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", bottom: "-160px", background: "#D9CFC0" }} />
+        <div className="glass relative w-full max-w-md p-8">
+          <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">30 seconds · then the AI takes over</p>
+          <h1 className="grad-text mt-1 text-center text-4xl">What&apos;s your business?</h1>
+          <div className="mt-6 grid gap-3">
+            <input className="field" value={draft.name} onChange={(e) => set("name", e.target.value)}
+              placeholder="Business name — e.g. Ada's Kitchen" />
+            <textarea className="field" rows={2} value={draft.description} onChange={(e) => set("description", e.target.value)}
+              placeholder="One line: what do you sell? — e.g. party jollof and weekly meal prep" />
+            <input className="field" value={draft.audience} onChange={(e) => set("audience", e.target.value)}
+              placeholder="Who buys? (optional) — e.g. busy parents" />
+            <button onClick={quickStart} className="btn-primary w-full py-3 text-base">Start my posts →</button>
+          </div>
+          {status && <p className="mt-3 text-center text-sm text-muted">{status}</p>}
+          <button onClick={() => setQuick(false)} className="mt-4 w-full text-center text-xs text-muted underline">
+            I prefer the detailed 5-step setup
+          </button>
         </div>
       </main>
     );

@@ -18,17 +18,23 @@ export default function AutopilotPage() {
 
   useEffect(() => {
     try {
-      setBusinessId(localStorage.getItem("business-id") ?? "");
+      const id = localStorage.getItem("business-id") ?? "";
+      setBusinessId(id);
+      if (typeof window !== "undefined" && window.location.search.includes("auto=1")) {
+        window.history.replaceState({}, "", "/autopilot");
+        setTimeout(() => runWith(id), 600);
+      }
     } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function run() {
+  async function runWith(id: string) {
     setBusy(true);
-    setMsg("Planning…");
+    setMsg("Making your posts…");
     try {
       const res = await fetch("/api/autopilot/plan", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businessId: businessId || undefined, guide: guide || undefined, count: 5 })
+        body: JSON.stringify({ businessId: id || undefined, guide: guide || undefined, count: 5 })
       });
       const body = await res.json();
       setIdeas(body.ideas ?? []);
@@ -39,6 +45,10 @@ export default function AutopilotPage() {
       setMsg("Request failed — is the dev server running?");
     }
     setBusy(false);
+  }
+
+  async function run() {
+    return runWith(businessId);
   }
 
   return (

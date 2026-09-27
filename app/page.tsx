@@ -145,15 +145,18 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {sections.map((s) => (
-            <a key={s.href} href={s.href} className="glass lift p-5">
-              <p className="text-lg font-semibold">{s.icon} {s.label}</p>
-              <p className="text-sm text-muted">{s.desc}</p>
-              <p className="mt-2 font-mono text-xs text-muted">{s.href} →</p>
-            </a>
-          ))}
-        </div>
+        <details className="mt-6">
+          <summary className="cursor-pointer text-center text-sm text-muted underline">More tools (special post, messages, settings…)</summary>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {sections.map((s) => (
+              <a key={s.href} href={s.href} className="glass lift p-5">
+                <p className="text-lg font-semibold">{s.icon} {s.label}</p>
+                <p className="text-sm text-muted">{s.desc}</p>
+                <p className="mt-2 font-mono text-xs text-muted">{s.href} →</p>
+              </a>
+            ))}
+          </div>
+        </details>
 
         <div className="glass mt-6 p-5">
           <p className="font-semibold">Beta feedback</p>
