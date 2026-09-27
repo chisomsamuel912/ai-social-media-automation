@@ -40,6 +40,8 @@ export default function Page() {
   const router = useRouter();
   const [attention, setAttention] = useState<Attention[]>([]);
   const [loopState, setLoopState] = useState({ setup: false, planned: false, posted: false, grew: false });
+  const [autoOn, setAutoOn] = useState(true);
+  const [lastPlan, setLastPlan] = useState("");
   const [feedback, setFeedback] = useState("");
   const [thanks, setThanks] = useState(false);
 
@@ -51,12 +53,20 @@ export default function Page() {
     (async () => {
     const list: Attention[] = [];
     try {
-      const hasBusiness = Boolean(localStorage.getItem("business-id"));
+      const bid = localStorage.getItem("business-id");
+      const hasBusiness = Boolean(bid);
+      try {
+        setLastPlan(localStorage.getItem("last-plan-at") ?? "");
+      } catch {}
+      if (bid) {
+        fetch(`/api/business?businessId=${bid}`).then((r) => r.json()).then((b) => {
+          if (typeof b.autoPlan === "boolean") setAutoOn(b.autoPlan);
+        }).catch(() => {});
+      }
       if (!hasBusiness) {
         list.push({ label: "Finish setup — 3 minutes, then the AI can plan for you", href: "/onboarding", tone: "amber" });
       } else {
         try {
-          const bid = localStorage.getItem("business-id");
           const pr = await fetch(`/api/review/pending?businessId=${bid}`).then((r) => r.json()).catch(() => null);
           const n = pr?.items?.length ?? 0;
           if (n > 0) list.push({ label: `✨ ${n} post${n > 1 ? "s" : ""} the AI made — waiting for your approval`, href: "/review", tone: "green" });
@@ -129,6 +139,36 @@ export default function Page() {
             <LoopStep n="3" title="Post" desc="Copy, paste, done" href="/schedule" done={loopState.posted} />
             <LoopStep n="4" title="Grow" desc="See what works, AI learns" href="/results" done={loopState.grew} />
           </div>
+        </div>
+
+        <div className="glass mt-4 flex flex-wrap items-center gap-3 p-4">
+          <span className="text-xl">{autoOn ? "🤖" : "😴"}</span>
+          <div className="text-sm">
+            <b>Automatic manager: {autoOn ? "ON" : "PAUSED"}</b>
+            <p className="text-muted">
+              {autoOn
+                ? "I make fresh posts on my own — you only approve."
+                : "Paused — nothing new will be made until you resume."}
+              {lastPlan && ` Last batch: ${new Date(lastPlan).toLocaleString()}.`}
+            </p>
+          </div>
+          <button
+            onClick={async () => {
+              const next = !autoOn;
+              setAutoOn(next);
+              try {
+                const bid = localStorage.getItem("business-id");
+                if (bid) {
+                  await fetch("/api/business", {
+                    method: "PATCH", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ businessId: bid, autoPlan: next })
+                  });
+                }
+              } catch {}
+            }}
+            className={autoOn ? "btn-ghost ml-auto !py-1.5 text-xs" : "btn-primary ml-auto !py-1.5 text-xs"}>
+            {autoOn ? "Pause" : "Resume"}
+          </button>
         </div>
 
         <div className="glass mt-6 p-5">

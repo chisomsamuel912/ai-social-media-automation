@@ -23,14 +23,20 @@ export default function AutopilotPage() {
       if (typeof window !== "undefined" && window.location.search.includes("auto=1")) {
         window.history.replaceState({}, "", "/autopilot");
         setTimeout(() => runWith(id), 600);
+        return;
+      }
+      // Fully automatic: business exists but nothing queued → make posts unasked.
+      const queue = JSON.parse(localStorage.getItem("schedule-queue") ?? "[]") as unknown[];
+      if (id && queue.length === 0) {
+        setTimeout(() => runWith(id, true), 800);
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function runWith(id: string) {
+  async function runWith(id: string, silent = false) {
     setBusy(true);
-    setMsg("Making your posts…");
+    setMsg(silent ? "I made these while you were away ✨" : "Making your posts…");
     try {
       const res = await fetch("/api/autopilot/plan", {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -40,7 +46,12 @@ export default function AutopilotPage() {
       setIdeas(body.ideas ?? []);
       setBlocked(body.blocked ?? 0);
       setName(body.businessName ?? "");
-      setMsg(res.ok ? "" : `Error: ${body.error ?? res.status}`);
+      setMsg(res.ok ? (silent ? `Fresh posts ready — review below, nothing goes out without you ✓` : "") : `Error: ${body.error ?? res.status}`);
+      if (res.ok) {
+        try {
+          localStorage.setItem("last-plan-at", new Date().toISOString());
+        } catch {}
+      }
     } catch {
       setMsg("Request failed — is the dev server running?");
     }
