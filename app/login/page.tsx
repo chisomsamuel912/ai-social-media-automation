@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 
 export default function LoginPage() {
-  const { user, signUp, signIn, signInGoogle, signOut } = useAuth();
+  const { user, signUp, signIn, signInGoogle, signInGuest, signOut } = useAuth();
   const [mode, setMode] = useState<"in" | "up">("up");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,6 +26,20 @@ export default function LoginPage() {
   async function google() {
     const err = await signInGoogle();
     if (err) setMsg(err.includes("provider") || err.includes("OAuth") ? "Google isn't enabled yet — use email for now." : err);
+  }
+
+  async function guest() {
+    setBusy(true);
+    setMsg("Getting you in…");
+    const err = await signInGuest();
+    if (err) {
+      setMsg(err.includes("Anonymous") || err.includes("anonymous")
+        ? "Guest mode isn't switched on yet — use email for now."
+        : err);
+    } else {
+      window.location.href = "/";
+    }
+    setBusy(false);
   }
 
   return (
@@ -56,6 +70,7 @@ export default function LoginPage() {
                 {busy ? "…" : mode === "up" ? "Create account" : "Log in"}
               </button>
               <button onClick={google} className="btn-ghost w-full">Continue with Google</button>
+              <button onClick={guest} disabled={busy} className="btn-ghost w-full">⚡ Continue as guest (no email)</button>
             </div>
             {msg && <p className="mt-3 text-center text-sm text-muted">{msg}</p>}
             <p className="mt-4 text-center text-sm text-muted">

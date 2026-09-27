@@ -1,3 +1,5 @@
+import { openrouterProvider } from "./openrouter";
+
 export type Platform = "instagram" | "facebook" | "tiktok" | "youtube" | "linkedin";
 
 export interface ContentIdea {
@@ -45,7 +47,9 @@ export const templateProvider: AIProvider = {
 };
 
 export function getProvider(): AIProvider {
-  // Free providers (ollama/gemini/groq) plug in here later behind the same interface.
-  // Unknown or missing key → template fallback, never crash.
+  // Server-side only: real free AI when a key exists, offline template otherwise.
+  if (process.env.AI_PROVIDER === "openrouter" && process.env.OPENROUTER_API_KEY) {
+    return openrouterProvider;
+  }
   return templateProvider;
 }

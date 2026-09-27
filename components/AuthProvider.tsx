@@ -9,6 +9,7 @@ interface AuthCtx {
   signUp: (email: string, password: string) => Promise<string | null>;
   signIn: (email: string, password: string) => Promise<string | null>;
   signInGoogle: () => Promise<string | null>;
+  signInGuest: () => Promise<string | null>;
   signOut: () => Promise<void>;
 }
 
@@ -18,6 +19,7 @@ const Ctx = createContext<AuthCtx>({
   signUp: async () => "unavailable",
   signIn: async () => "unavailable",
   signInGoogle: async () => "unavailable",
+  signInGuest: async () => "unavailable",
   signOut: async () => {}
 });
 
@@ -68,7 +70,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
-  return <Ctx.Provider value={{ user, ready, signUp, signIn, signInGoogle, signOut }}>{children}</Ctx.Provider>;
+  /** One-tap guest entry, no email. Needs Anonymous provider enabled in Supabase dashboard. */
+  async function signInGuest(): Promise<string | null> {
+    const db = getBrowserClient();
+    if (!db) return "Supabase keys missing.";
+    const { error } = await db.auth.signInAnonymously();
+    return error ? error.message : null;
+  }
+
+  return <Ctx.Provider value={{ user, ready, signUp, signIn, signInGoogle, signInGuest, signOut }}>{children}</Ctx.Provider>;
 }
 
 export const useAuth = () => useContext(Ctx);
