@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Growpilot — Design Preview</title>
+<style>
+  :root{
+    --primary:#4A5D4E;
+    --primary-dark:#3C4F40;
+    --secondary:#8A9B84;
+    --accent:#C08A3E;
+    --background:#F4F2ED;
+    --card:#FFFFFF;
+    --text:#2B2926;
+    --muted:#6E675C;
+    --border:#E3DED2;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--background);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px;line-height:1.6;
+    padding:40px 20px;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  /* 1–2 · name, heading, description */
+  .hero{text-align:center;padding:20px 0 34px}
+  .brand{
+    display:inline-block;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+    color:var(--primary);border:1.5px solid var(--primary);border-radius:999px;padding:6px 18px;
+  }
+  h1{
+    font-family:Georgia,"Times New Roman",serif;font-weight:700;
+    font-size:clamp(38px,5.5vw,60px);line-height:1.08;letter-spacing:-1px;margin:18px 0 12px;
+    text-wrap:balance;
+  }
+  h1 em{font-style:italic;color:var(--primary)}
+  .lede{max-width:620px;margin:0 auto;color:var(--text);font-size:18px;line-height:1.7}
+  /* 3 · palette */
+  section{margin-top:56px}
+  .kicker{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+    color:var(--primary);margin-bottom:8px;
+  }
+  h2{
+    font-family:Georgia,serif;font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1.2;margin-bottom:6px;
+  }
+  .sub{color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:18px;max-width:640px}
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .swatch{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .chip{height:72px}
+  .swatch div.body{padding:10px 12px}
+  .swatch b{font-size:14px;display:block}
+  .swatch span{font-size:12px;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace}
+  /* 4 · type */
+  .typegrid{display:grid;grid-template-columns:1fr;gap:12px}
+  .typerow{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+  .typerow small{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+  .h-display{font-family:Georgia,serif;font-size:34px;font-weight:700;line-height:1.15;letter-spacing:-.5px}
+  .h-section{font-family:Georgia,serif;font-size:23px;font-weight:700;letter-spacing:-.25px}
+  .body-text{font-size:16px;line-height:1.75;color:var(--text)}
+  .caption{font-size:13px;line-height:1.6;color:#5F594E}
+  /* 5–6 · button + input */
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--card);
+    border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+  .btn-primary{
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    color:#fff;font-weight:600;font-size:15px;border:none;border-radius:12px;
+    padding:12px 26px;cursor:pointer;box-shadow:0 10px 24px -10px rgba(60,79,64,.6);
+  }
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn-ghost{
+    background:transparent;color:var(--primary);font-weight:600;font-size:15px;
+    border:1.5px solid var(--primary);border-radius:12px;padding:10px 24px;cursor:pointer;
+  }
+  .field{
+    flex:1;min-width:220px;font-size:16px;line-height:1.5;color:var(--text);
+    background:#FFFFFF;border:2px solid var(--border);border-radius:12px;padding:13px 18px;
+  }
+  .field:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(74,93,78,.15)}
+  .field::placeholder{color:#6E675C;opacity:1}
+  /* 7 · dashboard preview */
+  .dash{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;
+    box-shadow:0 24px 60px -30px rgba(60,50,30,.25)}
+  .dash-top{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border)}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .dash-body{display:grid;grid-template-columns:190px 1fr}
+  .side{background:#ECE9E2;padding:16px 12px;display:flex;flex-direction:column;gap:4px}
+  .nav{font-size:13.5px;font-weight:600;padding:9px 12px;border-radius:10px;color:var(--muted)}
+  .nav.on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(60,50,30,.12)}
+  .pane{padding:20px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .stat{border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#FBFAF7}
+  .stat b{font-family:Georgia,serif;font-size:26px;display:block}
+  .stat span{font-size:12px;color:var(--muted)}
+  .post{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fff}
+  .post .meta{font-size:12px;color:var(--muted);margin-top:6px}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 10px;margin-right:6px}
+  .t-ready{background:#E3EBE1;color:#42563F}
+  .t-due{background:#F5EAD3;color:#7A5C2E}
+  .t-idea{background:#E4EAF0;color:#3D5A73}
+  .cta-row{display:flex;gap:10px;margin-top:4px}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin:40px 0 10px}
+  @media(max-width:640px){.dash-body{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="brand">Growpilot</span>
+    <h1>Your social media, <em>handled.</em></h1>
+    <p class="lede">An AI social-media employee for small businesses: it learns your business, makes your posts and pictures, reminds you when to publish, and learns what works. You just review and approve.</p>
+  </div>
+
+  <section>
+    <span class="kicker">01 · Colors</span>
+    <h2>Color palette</h2>
+    <p class="sub">Calm, warm, trustworthy — never harsh black or neon.</p>
+    <div class="swatches">
+      <div class="swatch"><div class="chip" style="background:#4A5D4E"></div><div class="body"><b>Primary · Moss</b><span>#4A5D4E — buttons, key actions</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#8A9B84"></div><div class="body"><b>Secondary · Sage</b><span>#8A9B84 — highlights, charts</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#C08A3E"></div><div class="body"><b>Accent · Amber</b><span>#C08A3E — warnings, leads</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#F4F2ED;border-bottom:1px solid #E3DED2"></div><div class="body"><b>Background · Paper</b><span>#F4F2ED — app canvas</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#2B2926"></div><div class="body"><b>Text · Ink</b><span>#2B2926 — headings &amp; body</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#6E675C"></div><div class="body"><b>Muted · Stone</b><span>#6E675C — secondary text</span></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">02 · Type</span>
+    <h2>Typography</h2>
+    <p class="sub">Warm serif for headlines, clean sans for everything else.</p>
+    <div class="typegrid">
+      <div class="typerow"><small>Display heading · Georgia Bold 32px</small><p class="h-display">This week's posts are ready 🎉</p></div>
+      <div class="typerow"><small>Section heading · Georgia Bold 22px</small><p class="h-section">What needs your attention?</p></div>
+      <div class="typerow"><small>Body · System sans 15px / 1.6</small><p class="body-text">The AI made 5 posts for WhatsApp and Facebook. Review them below — nothing goes out until you approve it.</p></div>
+      <div class="typerow"><small>Caption · System sans 13px muted</small><p class="caption">Suggested: Friday 6:30 PM · 0 recent duplicates</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">03 · Controls</span>
+    <h2>Buttons &amp; inputs</h2>
+    <p class="sub">One strong primary action per screen; inputs are large, soft, and obvious.</p>
+    <div class="controls">
+      <button class="btn-primary" type="button">Approve all →</button>
+      <button class="btn-ghost" type="button">Preview</button>
+      <input class="field" type="text" placeholder="Tell the AI what to focus on… e.g. more about saving">
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">04 · Product</span>
+    <h2>Dashboard preview</h2>
+    <p class="sub">What the owner sees each week: attention first, posts second, numbers third.</p>
+    <div class="dash">
+      <div class="dash-top">
+        <span class="dot" style="background:#D9A0A0"></span><span class="dot" style="background:#E4CF9E"></span><span class="dot" style="background:#9CAF88"></span>
+        <b style="margin-left:8px;font-size:14px">Growpilot · Home</b>
+      </div>
+      <div class="dash-body">
+        <div class="side">
+          <div class="nav on">🏠 Home</div><div class="nav">📝 Posts</div><div class="nav">📅 My posts</div>
+          <div class="nav">💬 Messages</div><div class="nav">📈 Growth</div><div class="nav">⚙️ Business</div>
+        </div>
+        <div class="pane">
+          <div class="stats">
+            <div class="stat"><b>7</b><span>posts ready</span></div>
+            <div class="stat"><b>2</b><span>🔥 leads waiting</span></div>
+            <div class="stat"><b>+32%</b><span>from videos</span></div>
+          </div>
+          <div class="post">
+            <span class="tag t-ready">✓ Ready</span><span class="tag t-idea">WhatsApp style</span>
+            <p style="margin-top:8px"><b>3 mistakes when saving 💰</b></p>
+            <p class="meta">Save first, spend the rest. Full checklist 👇 · Suggested Fri 6:30 PM</p>
+          </div>
+          <div class="post">
+            <span class="tag t-due">⏰ Due now</span><span class="tag t-idea">Facebook style</span>
+            <p style="margin-top:8px"><b>Behind the scenes at Ada's Kitchen 🍲</b></p>
+            <p class="meta">Saturday prep in photos — tell us your order in the comments 👇</p>
+          </div>
+          <div class="cta-row">
+            <button class="btn-primary" type="button" style="font-size:14px;padding:10px 22px">Approve all →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Growpilot design preview · HTML + CSS only · no live data</footer>
+</div>
+</body>
+</html>

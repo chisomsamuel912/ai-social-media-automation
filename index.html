@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Social Media Growth — Dashboard (Prototype)</title>
+<style>
+  :root{
+    --primary:#4A5D4E; --primary-dark:#3C4F40; --secondary:#8A9B84; --accent:#C08A3E;
+    --background:#F4F2ED; --card:#FFFFFF; --text:#2B2926; --muted:#5F594E;
+    --border:#E3DED2; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--background);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.7}
+  .app{display:grid;grid-template-columns:210px 1fr;min-height:100vh}
+  /* nav */
+  nav{background:#ECE9E2;border-right:1px solid #DDD8CC;padding:20px 12px;display:flex;flex-direction:column;gap:4px}
+  .logo{font-family:Georgia,serif;font-weight:700;font-size:19px;padding:4px 12px 16px;color:var(--primary)}
+  .logo small{display:block;font-family:inherit;font-size:11px;font-weight:400;color:var(--muted);letter-spacing:1px}
+  .navlink{font-size:14.5px;font-weight:600;padding:10px 12px;border-radius:10px;color:var(--muted);text-decoration:none}
+  .navlink.on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(60,50,30,.12)}
+  .navlink:hover{background:#fff}
+  .mocktag{margin-top:auto;font-size:11.5px;color:var(--muted);padding:10px 12px;border:1px dashed var(--border);border-radius:10px}
+  main{padding:28px;max-width:900px}
+  h1{font-family:Georgia,serif;font-size:clamp(30px,4vw,42px);letter-spacing:-.5px;line-height:1.15}
+  h2{font-family:Georgia,serif;font-size:22px;letter-spacing:-.25px;margin:30px 0 4px}
+  .sub{color:var(--muted);max-width:640px}
+  .aibanner{margin-top:16px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;
+    border-radius:var(--radius);padding:18px 22px;box-shadow:0 16px 36px -18px rgba(60,79,64,.7)}
+  .aibanner b{font-family:Georgia,serif;font-size:19px}
+  .aibanner p{font-size:14.5px;opacity:.92}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+  .stat b{font-family:Georgia,serif;font-size:32px;display:block;line-height:1.1}
+  .stat span{font-size:13px;color:var(--muted)}
+  .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-weight:700;
+    font-size:16px;border:none;border-radius:12px;padding:14px 30px;cursor:pointer;
+    box-shadow:0 10px 24px -10px rgba(60,79,64,.6)}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--primary);font-weight:600;font-size:14px;
+    border:1.5px solid var(--primary);border-radius:12px;padding:12px 22px;cursor:pointer}
+  /* composer (mock, local only) */
+  #composer{display:none;margin-top:14px;background:var(--card);border:1px solid var(--border);
+    border-radius:var(--radius);padding:18px}
+  #composer.open{display:block}
+  #composer input,#composer select{width:100%;font-size:16px;color:var(--text);background:#FBFAF7;
+    border:2px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+  #composer input:focus,#composer select:focus{outline:none;border-color:var(--primary)}
+  /* posts */
+  .post{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:12px}
+  .post p.title{font-weight:700;font-size:16.5px}
+  .post p.body{font-size:14.5px;color:var(--muted)}
+  .post .meta{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 10px;margin-right:6px}
+  .t-ok{background:#E3EBE1;color:#42563F}.t-due{background:#F5EAD3;color:#7A5C2E}.t-idea{background:#E4EAF0;color:#3D5A73}
+  /* insight */
+  .insight{margin-top:12px;background:#EFF0E8;border:1px solid #DDE0D2;border-radius:var(--radius);padding:18px 20px}
+  .insight b{font-family:Georgia,serif;font-size:18px}
+  .insight p{font-size:14.5px;color:var(--muted)}
+  footer{color:var(--muted);font-size:12.5px;margin:34px 0 10px}
+  @media(max-width:720px){
+    .app{grid-template-columns:1fr}
+    nav{flex-direction:row;overflow-x:auto;align-items:center;padding:10px}
+    .logo{padding:4px 10px;font-size:16px;white-space:nowrap}
+    .navlink{white-space:nowrap;font-size:13px}
+    .mocktag{display:none}
+    main{padding:18px}
+    .stats{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav aria-label="Main">
+    <div class="logo">AI Social Media Growth<small>MOCK PROTOTYPE</small></div>
+    <a class="navlink on" href="#home">🏠 Home</a>
+    <a class="navlink" href="#upcoming">🤖 Auto Pilot</a>
+    <a class="navlink" href="#composer" id="navCreate">✨ Create Content</a>
+    <a class="navlink" href="#upcoming">📅 Schedule</a>
+    <a class="navlink" href="#insight">💬 Customers</a>
+    <a class="navlink" href="#insight">📊 Results</a>
+    <a class="navlink" href="#home">🎨 Brand</a>
+    <div class="mocktag">All data on this page is fictional mock data for prototype review only.</div>
+  </nav>
+
+  <main id="home">
+    <h1>Good morning, Ada ☀️</h1>
+    <p class="sub">Here's your week at a glance. Everything below is sample data while we design the experience together.</p>
+
+    <div class="aibanner">
+      <b>🤖 The AI is handling your content</b>
+      <p>It planned 5 posts for WhatsApp and Facebook, made matching pictures, and picked the best times. You just review and tap approve — nothing goes out without you.</p>
+    </div>
+
+    <h2 id="summary">This week</h2>
+    <p class="sub">Weekly content summary (mock numbers).</p>
+    <div class="stats">
+      <div class="stat"><b id="statCreated">7</b><span>Posts created</span></div>
+      <div class="stat"><b id="statScheduled">5</b><span>Posts scheduled</span></div>
+      <div class="stat"><b>2</b><span>Platforms · WhatsApp + Facebook</span></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="btnCreate" type="button">✨ Create Content</button>
+      <button class="btn-ghost" type="button" onclick="document.getElementById('upcoming').scrollIntoView({behavior:'smooth'})">Review posts ↓</button>
+    </div>
+
+    <div id="composer" aria-live="polite">
+      <b>New post idea (mock — stays on this page only)</b>
+      <div style="height:10px"></div>
+      <input id="cTopic" type="text" placeholder="What is this post about? e.g. weekend discount">
+      <select id="cPlatform">
+        <option>WhatsApp</option>
+        <option>Facebook</option>
+      </select>
+      <button class="btn-primary" id="cAdd" type="button" style="font-size:14px;padding:10px 22px">Add to upcoming ↓</button>
+    </div>
+
+    <h2 id="upcoming">Upcoming Content <span style="font-size:12px;font-family:inherit;color:var(--muted)">· mock posts</span></h2>
+    <p class="sub">Sample posts the AI might prepare. Names, prices, and numbers are fictional.</p>
+    <div id="postList">
+      <div class="post">
+        <span class="tag t-ok">✓ Ready</span><span class="tag t-idea">WhatsApp style</span>
+        <p class="title">3 mistakes when saving 💰</p>
+        <p class="body">Save first, spend the rest. Full checklist inside 👇 Reply here to order 👈</p>
+        <p class="meta">Suggested: Friday 6:30 PM · Picture: savings checklist card</p>
+      </div>
+      <div class="post">
+        <span class="tag t-due">⏰ Due today</span><span class="tag t-idea">Facebook style</span>
+        <p class="title">Behind the scenes at Ada's Kitchen 🍲</p>
+        <p class="body">Saturday prep in photos — fresh trays out of the oven! Tell us your order in the comments 👇 #SmallBusiness #LagosFood</p>
+        <p class="meta">Suggested: Saturday 10:00 AM · Picture: kitchen photo collage</p>
+      </div>
+      <div class="post">
+        <span class="tag t-idea">Draft</span><span class="tag t-idea">WhatsApp style</span>
+        <p class="title">Weekend family platter 🍛</p>
+        <p class="body">Feeds 4–6, ready Saturday noon. One message and it's yours 👈</p>
+        <p class="meta">Suggested: Sunday 12:00 PM · Picture: platter photo</p>
+      </div>
+    </div>
+
+    <h2 id="insight">AI Insight</h2>
+    <p class="sub">How the AI learns from performance (example).</p>
+    <div class="insight">
+      <b>✨ Short videos earn 82% more replies than photos</b>
+      <p>Based on last week's sample results, the AI will plan 3 short videos instead of 1 next week — automatically. This is illustrative mock insight text, not real analytics.</p>
+    </div>
+
+    <footer>Prototype v0.1 · mock data only · no accounts, no database, no external services.</footer>
+  </main>
+</div>
+
+<script>
+// Local-only interactivity: no network, no storage, no services.
+(function(){
+  var composer = document.getElementById('composer');
+  var list = document.getElementById('postList');
+  var created = document.getElementById('statCreated');
+  function openComposer(){
+    composer.classList.add('open');
+    composer.scrollIntoView({behavior:'smooth', block:'center'});
+    var t = document.getElementById('cTopic'); if(t) t.focus();
+  }
+  document.getElementById('btnCreate').addEventListener('click', openComposer);
+  document.getElementById('navCreate').addEventListener('click', function(e){
+    e.preventDefault(); openComposer();
+  });
+  document.getElementById('cAdd').addEventListener('click', function(){
+    var topic = document.getElementById('cTopic').value.trim() || 'Untitled post idea';
+    var platform = document.getElementById('cPlatform').value;
+    var safe = topic.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var div = document.createElement('div');
+    div.className = 'post';
+    div.innerHTML = '<span class="tag t-idea">Draft · mock</span>' +
+      '<span class="tag t-idea">' + platform + ' style</span>' +
+      '<p class="title"></p><p class="body">Added just now in this prototype preview.</p>' +
+      '<p class="meta">Unscheduled · picture to be made</p>';
+    div.querySelector('.title').textContent = topic;
+    list.insertBefore(div, list.firstChild);
+    created.textContent = String(parseInt(created.textContent, 10) + 1);
+    document.getElementById('cTopic').value = '';
+  });
+})();
+</script>
+</body>
+</html>
