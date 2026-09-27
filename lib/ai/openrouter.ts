@@ -1,7 +1,7 @@
 import { templateProvider, type AIProvider, type ContentIdea, type Platform, type Variant } from "./provider";
 
 const API = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = process.env.OPENROUTER_MODEL ?? "google/gemma-4-31b-it:free";
+const MODEL = process.env.OPENROUTER_MODEL ?? "liquid/lfm-2.5-2.6b:free";
 const PILLARS = ["value", "engagement", "story", "promo"] as const;
 
 /** Pull a JSON array out of fenced or raw model output. Throws on garbage. */
@@ -73,7 +73,8 @@ export const openrouterProvider: AIProvider = {
         , 0.7
       );
       return parseIdeas(text).slice(0, count);
-    } catch {
+    } catch (e) {
+      console.error("[openrouter-plan-fallback]", e instanceof Error ? e.message : e);
       return templateProvider.plan({ businessName, guide, count });
     }
   },
