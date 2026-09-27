@@ -67,11 +67,11 @@ export default function OnboardingPage() {
         <div className="glass relative max-w-lg w-full p-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg,#55705a,#3c4f40)" }}>🎉</div>
           <h1 className="grad-text mt-4 text-4xl">You&apos;re set</h1>
-          <p className="mt-2 text-sm text-muted">Profile completeness: {score}% · Business ID saved for the Brand page.</p>
+          <p className="mt-2 text-sm text-muted">The AI now understands your business. Let&apos;s make your first posts.</p>
           <p className="mt-2 font-mono text-xs text-muted">{doneId}</p>
-          <div className="mt-6 flex justify-center gap-2">
-            <a href="/brand" className="btn-primary">Open Brand →</a>
-            <a href="/" className="btn-ghost">Home</a>
+          <div className="mt-6 flex flex-col justify-center gap-2">
+            <a href="/autopilot" className="btn-primary">See my first posts →</a>
+            <a href="/brand" className="btn-ghost text-sm">Add prices & photos first (recommended)</a>
           </div>
         </div>
       </main>

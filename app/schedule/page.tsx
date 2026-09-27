@@ -116,7 +116,12 @@ export default function SchedulePage() {
           })}
         </div>
 
-        {done.length > 0 && <p className="mt-6 text-sm font-semibold">Published ({done.length}) — log results</p>}
+        {done.length > 0 && (
+          <div className="glass mt-4 p-4 text-center text-sm">
+            Nice — {done.length} posted ✓. <a href="/results" className="font-semibold underline">See what&apos;s working →</a>
+          </div>
+        )}
+        {done.length > 0 && <p className="mt-6 text-sm font-semibold">Posted ({done.length}) — log your numbers</p>}
         <div className="mt-2 grid gap-3">
           {done.map((item) => {
             const m = metrics[item.key] ?? { views: "", likes: "", comments: "" };
