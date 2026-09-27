@@ -1,6 +1,7 @@
 import { openrouterProvider } from "./openrouter";
 
-export type Platform = "instagram" | "facebook" | "tiktok" | "youtube" | "linkedin";
+/** MVP leads with whatsapp + facebook; the rest unlock post-MVP. */
+export type Platform = "whatsapp" | "instagram" | "facebook" | "tiktok" | "youtube" | "linkedin";
 
 export interface ContentIdea {
   topic: string;

@@ -45,9 +45,10 @@ describe("whatsapp adapter", () => {
     expect(out.caption).toContain("Reply here to order");
     expect(out.caption).not.toContain("#food");
   });
-  it("facebook keeps max 3 hashtags", () => {
-    const out = adapt({ platform: "facebook", caption: "Hi", hashtags: ["#a", "#b", "#c", "#d", "#e"] } as never);
-    expect(out.hashtags).toHaveLength(3);
+  it("facebook keeps hashtags and adds discussion CTA", () => {
+    const out = adapt({ platform: "facebook", caption: "Hi", hashtags: ["#a", "#b", "#c", "#d", "#e", "#f"] } as never);
+    expect(out.hashtags).toHaveLength(5);
+    expect(/comments/i.test(out.caption)).toBe(true);
   });
 });
 

@@ -48,11 +48,19 @@ export default function Page() {
   }, [ready, user, router]);
 
   useEffect(() => {
+    (async () => {
     const list: Attention[] = [];
     try {
       const hasBusiness = Boolean(localStorage.getItem("business-id"));
       if (!hasBusiness) {
         list.push({ label: "Finish setup — 3 minutes, then the AI can plan for you", href: "/onboarding", tone: "amber" });
+      } else {
+        try {
+          const bid = localStorage.getItem("business-id");
+          const pr = await fetch(`/api/review/pending?businessId=${bid}`).then((r) => r.json()).catch(() => null);
+          const n = pr?.items?.length ?? 0;
+          if (n > 0) list.push({ label: `✨ ${n} post${n > 1 ? "s" : ""} the AI made — waiting for your approval`, href: "/review", tone: "green" });
+        } catch {}
       }
       const queue = loadQueue();
       setLoopState({
@@ -82,6 +90,7 @@ export default function Page() {
       if (followups.length > 0) list.push({ label: `⏰ ${followups.length} follow-up${followups.length > 1 ? "s" : ""} due`, href: "/customers", tone: "blue" });
     } catch {}
     setAttention(list);
+    })();
   }, []);
 
   async function sendFeedback(kind: string) {

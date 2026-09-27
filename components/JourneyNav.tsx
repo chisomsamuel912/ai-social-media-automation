@@ -6,6 +6,7 @@ import SessionChip from "./SessionChip";
 const STEPS = [
   { href: "/onboarding", label: "Setup", match: ["/onboarding"] },
   { href: "/autopilot", label: "Posts", match: ["/autopilot", "/create"] },
+  { href: "/review", label: "Review", match: ["/review"] },
   { href: "/schedule", label: "My posts", match: ["/schedule"] },
   { href: "/customers", label: "Messages", match: ["/customers"] },
   { href: "/results", label: "Growth", match: ["/results"] }
