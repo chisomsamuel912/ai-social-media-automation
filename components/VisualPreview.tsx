@@ -12,18 +12,27 @@ export default function VisualPreview({ topic, angle, businessName }: { topic: s
   const [format, setFormat] = useState<VisualFormat>("image");
   const [slides, setSlides] = useState<string[]>([]);
   const [slide, setSlide] = useState(0);
+  const [aiImage, setAiImage] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     let live = true;
     setSlides([]);
     setSlide(0);
+    setAiImage(null);
+    setAiLoading(format === "image");
     fetch("/api/visual", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ format, headline: topic, subline: angle, businessName })
     })
       .then((r) => r.json())
-      .then((b) => { if (live && b.slides) setSlides(b.slides); })
-      .catch(() => {});
+      .then((b) => {
+        if (!live) return;
+        if (b.slides) setSlides(b.slides);
+        if (b.aiImage) setAiImage(b.aiImage);
+        setAiLoading(false);
+      })
+      .catch(() => { if (live) setAiLoading(false); });
     return () => { live = false; };
   }, [format, topic, angle, businessName]);
 
@@ -39,9 +48,19 @@ export default function VisualPreview({ topic, angle, businessName }: { topic: s
         </div>
       </div>
       <div className="glass-soft relative mt-2 overflow-hidden">
-        {slides.length === 0 && <p className="p-6 text-center text-xs text-muted">Rendering visual…</p>}
-        {slides.length > 0 && (
-          <div dangerouslySetInnerHTML={{ __html: slides[Math.min(slide, slides.length - 1)] }} />
+        {aiImage ? (
+          <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={aiImage} alt={topic} className="h-auto w-full" />
+            <span className="pill absolute left-2 top-2" style={{ background: "rgba(43,41,38,.8)", color: "#fff", border: "none" }}>✨ AI picture</span>
+          </div>
+        ) : (
+          <>
+            {slides.length === 0 && <p className="p-6 text-center text-xs text-muted">{aiLoading ? "Painting AI picture…" : "Rendering visual…"}</p>}
+            {slides.length > 0 && (
+              <div dangerouslySetInnerHTML={{ __html: slides[Math.min(slide, slides.length - 1)] }} />
+            )}
+          </>
         )}
         {slides.length > 1 && (
           <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
