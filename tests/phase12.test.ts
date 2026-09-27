@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildImagePrompt, generateImage } from "../lib/visual-ai";
+import { buildImagePrompt, generateFreeImage, generateImage } from "../lib/visual-ai";
 
 describe("buildImagePrompt", () => {
   it("includes headline and business, bans text overlay", () => {
@@ -17,5 +17,8 @@ describe("generateImage", () => {
   it("returns null with no token (template fallback)", async () => {
     delete process.env.HF_TOKEN;
     await expect(generateImage("test")).resolves.toBeNull();
+  });
+  it("free provider is a function (network tested live, not in unit)", () => {
+    expect(typeof generateFreeImage).toBe("function");
   });
 });

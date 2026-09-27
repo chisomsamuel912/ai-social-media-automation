@@ -9,9 +9,28 @@ export function buildImagePrompt(headline: string, businessName?: string, style?
 }
 
 /**
+ * Real AI picture, $0, no key needed: Pollinations free tier.
+ * Server-fetched and returned as a data URI. Null on any failure.
+ */
+export async function generateFreeImage(headline: string, businessName?: string): Promise<string | null> {
+  try {
+    const prompt = encodeURIComponent(`${buildImagePrompt(headline, businessName)}`.slice(0, 900));
+    const url = `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&model=flux`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.length < 20_000) return null;
+    const type = res.headers.get("content-type")?.includes("png") ? "png" : "jpeg";
+    return `data:image/${type};base64,${buf.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Real AI picture via Hugging Face free inference (BYO free token).
  * Returns a data URI on success, null on any failure (rate limit, model
- * loading, no token) so callers fall back to SVG templates. Never throws.
+ * loading, no token, retired endpoint) so callers fall back. Never throws.
  */
 export async function generateImage(headline: string, businessName?: string): Promise<string | null> {
   const token = process.env.HF_TOKEN;
