@@ -52,7 +52,7 @@ export default function PlanResults({ ideas, blocked, businessName }: { ideas: P
         <div key={i} className="glass lift p-5">
           <p className="serif mt-1 text-xl">{idea.topic}</p>
           <p className="text-xs text-muted">Why this post: {idea.angle} · Style: {idea.format}</p>
-          <VisualPreview topic={idea.topic} angle={idea.angle} businessName={businessName} />
+          <VisualPreview topic={idea.topic} angle={idea.angle} businessName={businessName} order={i} />
           {idea.needsInfo && (
             <div className="mt-3 rounded-xl p-3 text-sm" style={{ background: "#F5EAD3", border: "1px solid #D9C39A" }}>
               <b>Heads up — a price is missing.</b> This post talks about an offer but you haven&apos;t told the AI the price yet.{" "}

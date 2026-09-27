@@ -8,7 +8,7 @@ const FORMATS: Array<{ id: VisualFormat; label: string }> = [
   { id: "script", label: "🎬 Script" }
 ];
 
-export default function VisualPreview({ topic, angle, businessName }: { topic: string; angle: string; businessName?: string }) {
+export default function VisualPreview({ topic, angle, businessName, order = 0 }: { topic: string; angle: string; businessName?: string; order?: number }) {
   const [format, setFormat] = useState<VisualFormat>("image");
   const [slides, setSlides] = useState<string[]>([]);
   const [slide, setSlide] = useState(0);
@@ -17,6 +17,10 @@ export default function VisualPreview({ topic, angle, businessName }: { topic: s
 
   useEffect(() => {
     let live = true;
+    // Stagger image requests so the free queue isn't hit 5-at-once.
+    const wait = format === "image" ? order * 5000 : 0;
+    const timer = setTimeout(() => {
+      if (!live) return;
     setSlides([]);
     setSlide(0);
     setAiImage(null);
@@ -33,8 +37,9 @@ export default function VisualPreview({ topic, angle, businessName }: { topic: s
         setAiLoading(false);
       })
       .catch(() => { if (live) setAiLoading(false); });
-    return () => { live = false; };
-  }, [format, topic, angle, businessName]);
+    }, wait);
+    return () => { live = false; clearTimeout(timer); };
+  }, [format, topic, angle, businessName, order]);
 
   return (
     <div className="mt-3">

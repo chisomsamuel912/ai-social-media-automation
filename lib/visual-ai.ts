@@ -10,21 +10,27 @@ export function buildImagePrompt(headline: string, businessName?: string, style?
 
 /**
  * Real AI picture, $0, no key needed: Pollinations free tier.
- * Server-fetched and returned as a data URI. Null on any failure.
+ * Server-fetched and returned as a data URI. Retries with backoff because
+ * the free queue drops parallel bursts — stragglers succeed on retry.
+ * Null only after all attempts fail. Never throws.
  */
 export async function generateFreeImage(headline: string, businessName?: string): Promise<string | null> {
-  try {
-    const prompt = encodeURIComponent(`${buildImagePrompt(headline, businessName)}`.slice(0, 900));
-    const url = `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&model=flux`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
-    if (buf.length < 20_000) return null;
-    const type = res.headers.get("content-type")?.includes("png") ? "png" : "jpeg";
-    return `data:image/${type};base64,${buf.toString("base64")}`;
-  } catch {
-    return null;
+  const prompt = encodeURIComponent(`${buildImagePrompt(headline, businessName)}`.slice(0, 900));
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      if (attempt > 0) await new Promise((r) => setTimeout(r, 4000 * attempt));
+      const url = `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&model=flux&seed=${attempt}`;
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (buf.length < 20_000) continue;
+      const type = res.headers.get("content-type")?.includes("png") ? "png" : "jpeg";
+      return `data:image/${type};base64,${buf.toString("base64")}`;
+    } catch {
+      continue;
+    }
   }
+  return null;
 }
 
 /**
