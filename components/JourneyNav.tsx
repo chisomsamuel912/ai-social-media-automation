@@ -5,7 +5,7 @@ import SessionChip from "./SessionChip";
 
 const STEPS = [
   { href: "/onboarding", label: "Setup", match: ["/onboarding"] },
-  { href: "/autopilot", label: "Posts", match: ["/autopilot", "/create"] },
+  { href: "/autopilot", label: "Posts", match: ["/autopilot"] },
   { href: "/review", label: "Review", match: ["/review"] },
   { href: "/schedule", label: "My posts", match: ["/schedule"] },
   { href: "/customers", label: "Messages", match: ["/customers"] },
@@ -52,8 +52,6 @@ export default function JourneyNav() {
             </a>
           );
         })}
-        <a href="/brand" title="My business: prices, photos, facts"
-          className={`shrink-0 rounded-full px-2 py-1.5 text-xs ${path.startsWith("/brand") ? "font-bold" : "text-muted"}`}>⚙️</a>
         <span className="ml-auto shrink-0"><SessionChip /></span>
       </div>
     </header>

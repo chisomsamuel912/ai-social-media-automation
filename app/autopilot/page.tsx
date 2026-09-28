@@ -100,6 +100,11 @@ export default function AutopilotPage() {
         </details>
 
         <div className="mt-4"><PlanResults ideas={ideas} blocked={blocked} businessName={name} /></div>
+
+        <p className="mt-6 text-center text-xs text-muted">
+          Need one special post? <a href="/create" className="underline">Make it here →</a>
+          {" · "}Selling something with a price? <a href="/brand" className="underline">Tell the AI once →</a>
+        </p>
       </div>
     </main>
   );
