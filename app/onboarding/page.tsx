@@ -21,6 +21,7 @@ export default function OnboardingPage() {
   const [status, setStatus] = useState<string>("");
   const [doneId, setDoneId] = useState<string>("");
   const [quick, setQuick] = useState(true);
+  const [goal, setGoal] = useState("Get more customers");
 
   useEffect(() => {
     try {
@@ -78,15 +79,20 @@ export default function OnboardingPage() {
   }
 
   async function quickStart() {
-    if (draft.name.trim().length < 2 || draft.description.trim().length < 10) {
-      setStatus("Just two things: your business name and one line about what you do.");
+    if (draft.name.trim().length < 2 || draft.products.trim().length < 3) {
+      setStatus("Just two things: your business name and what you sell.");
       return;
     }
     setStatus("Saving…");
     const res = await fetch("/api/onboarding", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...draft, ownerId: user?.id })
+      body: JSON.stringify({
+        ...draft,
+        description: draft.products,
+        goals: goal,
+        ownerId: user?.id
+      })
     });
     const body = await res.json().catch(() => ({}));
     if (res.ok) {
@@ -112,12 +118,24 @@ export default function OnboardingPage() {
           <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">30 seconds · then the AI takes over</p>
           <h1 className="grad-text mt-1 text-center text-4xl">What&apos;s your business?</h1>
           <div className="mt-6 grid gap-3">
-            <input className="field" value={draft.name} onChange={(e) => set("name", e.target.value)}
-              placeholder="Business name — e.g. Ada's Kitchen" />
-            <textarea className="field" rows={2} value={draft.description} onChange={(e) => set("description", e.target.value)}
-              placeholder="One line: what do you sell? — e.g. party jollof and weekly meal prep" />
-            <input className="field" value={draft.audience} onChange={(e) => set("audience", e.target.value)}
-              placeholder="Who buys? (optional) — e.g. busy parents" />
+            <label className="block">
+              <span className="text-sm font-medium">Business</span>
+              <input className="field mt-1.5" value={draft.name} onChange={(e) => set("name", e.target.value)}
+                placeholder="Chinelo's Fashion" />
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium">Product</span>
+              <input className="field mt-1.5" value={draft.products} onChange={(e) => set("products", e.target.value)}
+                placeholder="Women's native dresses" />
+            </label>
+            <div>
+              <p className="text-sm font-medium">Goal</p>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {["Get more customers", "Get more orders", "Grow my followers"].map((g) => (
+                  <button key={g} onClick={() => setGoal(g)} className={`pill ${goal === g ? "on" : ""}`}>{g}</button>
+                ))}
+              </div>
+            </div>
             <button onClick={quickStart} className="btn-primary w-full py-3 text-base">Start my posts →</button>
           </div>
           {status && <p className="mt-3 text-center text-sm text-muted">{status}</p>}
