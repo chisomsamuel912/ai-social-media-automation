@@ -3,9 +3,9 @@ const DEFAULT_IMAGE_MODEL = process.env.HF_IMAGE_MODEL ?? "black-forest-labs/FLU
 
 /** Prompt builder: headline + business + style → image prompt. Pure, tested. */
 export function buildImagePrompt(headline: string, businessName?: string, style?: string): string {
-  const who = businessName && businessName !== "My Business" ? ` for ${businessName}` : "";
-  const look = style || "warm, clean small-business social media aesthetic, soft natural light, no text overlay";
-  return `Square social media graphic: ${headline}${who}. ${look}. High quality, professional food-and-lifestyle photography style.`;
+  const who = businessName && businessName !== "My Business" ? ` for a small business called ${businessName}` : "";
+  const look = style || "ultra-detailed professional commercial photography, rich warm color grade, soft directional window light with gentle shadows, shallow depth of field, textured surfaces, vibrant but natural colors, sharp focus on hero subject, premium advertising quality";
+  return `Square 1:1 social media photograph: ${headline}${who}. ${look}. No text, no words, no letters, no watermark, no logo overlay.`;
 }
 
 /**

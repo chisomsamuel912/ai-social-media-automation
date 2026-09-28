@@ -69,9 +69,9 @@ export const openrouterProvider: AIProvider = {
   async plan({ businessName, guide, count = 5 }) {
     try {
       const text = await chat(
-        "You are a social media strategist for small businesses. Reply with ONLY a JSON array, no other text.",
-        `Business: ${businessName}. ${guide ? `Focus: ${guide}.` : ""} Give ${count} content ideas as JSON: [{"topic":"...","angle":"...","format":"Image|Short video|Carousel|Tips|Story|Poll","pillar":"value|engagement|story|promo"}]. Mix pillars; at most 40% promo. Angles must differ from each other.`
-        , 0.7
+        "You are a sharp social media strategist for small businesses. Be concrete and sensory: name real details, real numbers, real situations. Never generic filler like 'quality products' or 'best service'. Reply with ONLY a JSON array, no other text.",
+        `Business: ${businessName}. ${guide ? `Focus: ${guide}.` : ""} Give ${count} content ideas as JSON: [{"topic":"...","angle":"...","format":"Image|Short video|Carousel|Tips|Story|Poll","pillar":"value|engagement|story|promo"}]. Mix pillars; at most 40% promo. Angles must differ from each other. Topics must sound human and specific, never templated.`
+        , 0.85
       );
       return parseIdeas(text).slice(0, count);
     } catch (e) {
@@ -82,9 +82,9 @@ export const openrouterProvider: AIProvider = {
   async generate(idea, platform) {
     try {
       const text = await chat(
-        "You write short social-media posts. Reply with ONLY JSON, no other text.",
-        `Write a ${platform} post for: "${idea.topic}" (angle: ${idea.angle}, format: ${idea.format}). JSON: {"caption":"...","hashtags":["#a"],"script":"..."}. Keep captions under 150 words. Include script only for video formats.`
-        , 0.8
+        "You write thumb-stopping social posts for small businesses. Concrete and human: vivid verbs, real specifics, zero clichés. Reply with ONLY JSON, no other text.",
+        `Write a ${platform} post for: "${idea.topic}" (angle: ${idea.angle}, format: ${idea.format}). JSON: {"caption":"...","hashtags":["#a"],"script":"..."}. Caption under 150 words, opens with a hook line that earns the next line. Include script only for video formats.`
+        , 0.9
       );
       return parseVariant(text, platform);
     } catch {

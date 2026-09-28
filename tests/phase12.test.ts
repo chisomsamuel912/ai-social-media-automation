@@ -6,7 +6,7 @@ describe("buildImagePrompt", () => {
     const p = buildImagePrompt("Weekend sourdough sale", "Ada's Kitchen");
     expect(p).toContain("Weekend sourdough sale");
     expect(p).toContain("Ada's Kitchen");
-    expect(p).toContain("no text overlay");
+    expect(p).toContain("No text");
   });
   it("skips placeholder business names", () => {
     expect(buildImagePrompt("Hi", "My Business")).not.toContain("My Business");
