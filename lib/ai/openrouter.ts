@@ -50,6 +50,7 @@ async function chat(system: string, user: string, temperature: number): Promise<
       Authorization: `Bearer ${key}`,
       "X-Title": "Growpilot"
     },
+    signal: AbortSignal.timeout(60_000),
     body: JSON.stringify({ model: MODEL, messages: [{ role: "system", content: system }, { role: "user", content: user }], temperature })
   });
   if (!res.ok) throw new Error(`openrouter-${res.status}`);
