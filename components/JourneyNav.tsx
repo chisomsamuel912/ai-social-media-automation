@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import SessionChip from "./SessionChip";
 
+// Beginner test version: only the 3 steps a new owner needs.
+// Messages + Growth live behind home + attention banners until there's something to see.
 const STEPS = [
-  { href: "/onboarding", label: "Setup", match: ["/onboarding"] },
-  { href: "/autopilot", label: "Posts", match: ["/autopilot"] },
-  { href: "/review", label: "Review", match: ["/review"] },
-  { href: "/schedule", label: "My posts", match: ["/schedule"] },
-  { href: "/customers", label: "Messages", match: ["/customers"] },
-  { href: "/results", label: "Growth", match: ["/results"] }
+  { href: "/onboarding", label: "1 · Setup", match: ["/onboarding", "/brand"] },
+  { href: "/autopilot", label: "2 · Posts", match: ["/autopilot", "/create", "/review"] },
+  { href: "/schedule", label: "3 · My posts", match: ["/schedule", "/customers", "/results"] }
 ];
 
 /** One connected journey on every screen: Setup → Posts → My posts → Messages → Growth. */

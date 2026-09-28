@@ -14,12 +14,18 @@ export default function AutopilotPage() {
   const [msg, setMsg] = useState("");
   const [trend, setTrend] = useState("");
   const [checks, setChecks] = useState({ niche: false, audience: false, brand: false, timely: false });
+  const [pending, setPending] = useState(0);
   const holidays = upcomingHolidays();
 
   useEffect(() => {
     try {
       const id = localStorage.getItem("business-id") ?? "";
       setBusinessId(id);
+      if (id) {
+        fetch(`/api/review/pending?businessId=${id}`).then((r) => r.json()).then((b) => {
+          if (Array.isArray(b.items)) setPending(b.items.length);
+        }).catch(() => {});
+      }
       if (typeof window !== "undefined" && window.location.search.includes("auto=1")) {
         window.history.replaceState({}, "", "/autopilot");
         setTimeout(() => runWith(id), 600);
@@ -76,6 +82,11 @@ export default function AutopilotPage() {
         </div>
         {name && <p className="mt-2 text-center text-xs text-muted">Planning for {name} · WhatsApp + Facebook</p>}
         {msg && <p className="mt-2 text-center text-sm text-muted">{msg}</p>}
+        {pending > 0 && (
+          <a href="/review" className="glass mt-3 block p-4 text-center text-sm">
+            ✨ <b>{pending} posts the AI made are waiting.</b> <span className="underline">Review them →</span>
+          </a>
+        )}
 
         <details className="glass-soft mt-3 p-4 text-sm">
           <summary className="cursor-pointer font-semibold">📅 Holiday or trend to ride? (optional)</summary>
@@ -104,6 +115,8 @@ export default function AutopilotPage() {
         <p className="mt-6 text-center text-xs text-muted">
           Need one special post? <a href="/create" className="underline">Make it here →</a>
           {" · "}Selling something with a price? <a href="/brand" className="underline">Tell the AI once →</a>
+          {" · "}Customer messages? <a href="/customers" className="underline">Inbox →</a>
+          {" · "}How am I doing? <a href="/results" className="underline">Growth →</a>
         </p>
       </div>
     </main>
