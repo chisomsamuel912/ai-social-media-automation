@@ -3,6 +3,7 @@ import { z } from "zod";
 import { tooMany } from "@/lib/audit";
 import { clientKey, dailyQuota, rateLimit } from "@/lib/ratelimit";
 import { renderVisual, type VisualFormat } from "@/lib/templates";
+import { generateGeminiImage } from "@/lib/ai/gemini";
 import { generateFreeImage, generateImage } from "@/lib/visual-ai";
 
 const Body = z.object({
@@ -21,10 +22,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "daily-quota", hint: "50 renders/day used. Back tomorrow." }, { status: 429 });
   }
   const slides = renderVisual({ ...(parsed.data as { format: VisualFormat; headline: string }), ...parsed.data });
-  // Real AI picture first (free tiers); template slides always included as backup.
+  // Picture chain: Gemini (best) → HF → keyless free → template backup.
   let aiImage: string | null = null;
   if (parsed.data.format === "image") {
-    aiImage = await generateImage(parsed.data.headline, parsed.data.businessName);
+    aiImage = await generateGeminiImage(parsed.data.headline);
+    if (!aiImage) aiImage = await generateImage(parsed.data.headline, parsed.data.businessName);
     if (!aiImage) aiImage = await generateFreeImage(parsed.data.headline, parsed.data.businessName);
   }
   return NextResponse.json({ ok: true, format: parsed.data.format, slides, aiImage });

@@ -1,4 +1,5 @@
 import { openrouterProvider } from "./openrouter";
+import { geminiProvider } from "./gemini";
 
 /** MVP leads with whatsapp + facebook; the rest unlock post-MVP. */
 export type Platform = "whatsapp" | "instagram" | "facebook" | "tiktok" | "youtube" | "linkedin";
@@ -48,7 +49,9 @@ export const templateProvider: AIProvider = {
 };
 
 export function getProvider(): AIProvider {
-  // Server-side only: real free AI when a key exists, offline template otherwise.
+  // Server-side only. Gemini first (generous free tier), then OpenRouter
+  // free models, then the offline template. Never crashes.
+  if (process.env.GEMINI_API_KEY) return geminiProvider;
   if (process.env.AI_PROVIDER === "openrouter" && process.env.OPENROUTER_API_KEY) {
     return openrouterProvider;
   }
