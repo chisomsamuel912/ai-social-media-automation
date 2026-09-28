@@ -79,6 +79,9 @@ export default function LoginPage() {
                 {mode === "up" ? "Log in" : "Sign up"}
               </button>
             </p>
+            <p className="mt-2 text-center text-sm">
+              <a href="/start" className="font-semibold underline">Just want posts? Try it instantly — no account →</a>
+            </p>
           </>
         )}
       </div>
