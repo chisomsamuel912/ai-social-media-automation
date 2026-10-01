@@ -79,6 +79,19 @@ export default function SchedulePage() {
       <div className="relative mx-auto max-w-2xl">
         <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">📅 Schedule · Remind Me</p>
         <h1 className="grad-text mt-1 text-center text-4xl">Upcoming posts</h1>
+        {queue.length > 0 && (
+          <div className="mt-2 text-center">
+            <button
+              onClick={() => {
+                if (confirm("Delete everything in this list? Published history stays in the app log.")) {
+                  save([]);
+                }
+              }}
+              className="text-xs text-muted underline">
+              Delete everything in this list
+            </button>
+          </div>
+        )}
         {msg && <p className="mt-2 text-center text-sm text-muted">{msg}</p>}
 
         {queue.length === 0 && (
