@@ -6,6 +6,7 @@ import { clientKey, rateLimit } from "@/lib/ratelimit";
 
 const Body = z.object({
   ownerId: z.string().uuid().optional(),
+  businessId: z.string().uuid().optional(),
   name: z.string().min(2).max(120),
   sells: z.string().min(3).max(300),
   customers: z.string().max(300).default(""),
@@ -57,4 +58,30 @@ export async function POST(req: Request) {
   await db.from("brands").insert({ business_id: biz.id });
   await audit("onboarding", "business created", { businessId: biz.id });
   return NextResponse.json({ ok: true, businessId: biz.id });
+}
+
+/** Re-setup: update the existing business instead of piling up duplicates. */
+export async function PUT(req: Request) {
+  const parsed = Body.safeParse(await req.json().catch(() => ({})));
+  if (!parsed.success) return NextResponse.json({ error: "invalid-body" }, { status: 400 });
+  const { businessId, ...rest } = parsed.data as typeof parsed.data & { businessId?: string };
+  if (!businessId) return NextResponse.json({ error: "businessId-required" }, { status: 400 });
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json({ error: "supabase-not-configured" }, { status: 503 });
+  }
+  const b = parsed.data;
+  const db = getServiceClient();
+  if (!db) return NextResponse.json({ error: "supabase-not-configured" }, { status: 503 });
+  const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
+  await db.from("businesses").update({ name: b.name, description: b.sells }).eq("id", businessId);
+  await db.from("content_profiles").upsert({
+    business_id: businessId,
+    audience_json: { customers: b.customers, platforms: b.platforms },
+    tone: b.tone,
+    topics: csv(b.topics),
+    avoid_topics: [],
+    goals: []
+  }, { onConflict: "business_id" });
+  await audit("onboarding", "business updated", { businessId });
+  return NextResponse.json({ ok: true, businessId });
 }

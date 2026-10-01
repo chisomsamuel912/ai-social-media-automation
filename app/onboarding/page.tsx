@@ -44,9 +44,13 @@ export default function OnboardingPage() {
     }
     setBusy(true);
     setStatus("Saving…");
+    let existing: string | null = null;
+    try {
+      existing = localStorage.getItem("business-id");
+    } catch {}
     try {
       const res = await fetch("/api/onboarding", {
-        method: "POST",
+        method: existing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
@@ -55,7 +59,8 @@ export default function OnboardingPage() {
           tone,
           topics: topics.trim(),
           platforms,
-          ownerId: user?.id
+          ownerId: user?.id,
+          ...(existing ? { businessId: existing } : {})
         })
       });
       const body = await res.json().catch(() => ({}));

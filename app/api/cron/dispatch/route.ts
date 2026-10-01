@@ -25,6 +25,11 @@ export async function GET() {
 
   for (const biz of (businesses ?? []) as Array<{ id: string; name: string; sales_channels: string[] }>) {
     try {
+      // No pile-ups: if posts are still waiting, don't make more.
+      const pending = await db!.from("posts").select("id", { count: "exact", head: true })
+        .eq("business_id", biz.id)
+        .in("status", ["needs-review", "scheduled", "reminded"]);
+      if ((pending.count ?? 1) > 0) continue;
       const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString();
       const recent = await db!.from("content_ideas")
         .select("id", { count: "exact", head: true })
