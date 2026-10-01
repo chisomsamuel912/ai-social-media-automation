@@ -100,8 +100,9 @@ export default function ReviewPage() {
   const [businessName, setBusinessName] = useState("");
   const [msg, setMsg] = useState("Checking for posts the AI made for you…");
   const [busy, setBusy] = useState(false);
+  const [waiting, setWaiting] = useState(false);
 
-  async function load() {
+  async function load(silent = false) {
     let businessId: string | null = null;
     try {
       businessId = localStorage.getItem("business-id");
@@ -126,6 +127,23 @@ export default function ReviewPage() {
 
   useEffect(() => {
     load();
+    // While the first batch is being made, keep checking — posts appear on their own.
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries += 1;
+      setItems((current) => {
+        if (current.length === 0 && tries <= 12) {
+          setWaiting(true);
+          setMsg("Making your 2 posts… they will appear here by themselves.");
+          load(true);
+        } else {
+          setWaiting(false);
+          clearInterval(timer);
+        }
+        return current;
+      });
+    }, 15000);
+    return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

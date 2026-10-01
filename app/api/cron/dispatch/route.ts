@@ -41,7 +41,7 @@ export async function GET() {
 
       const { ideas } = await planContent({
         businessName: biz.name ?? "My Business",
-        count: 5,
+        count: 2,
         salesChannel: biz.sales_channels?.[0] ?? "whatsapp",
         historyKeys,
         factCount: facts.count ?? 0

@@ -21,6 +21,14 @@ export default function OnboardingPage() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
 
+  useEffect(() => {
+    if (!done) return;
+    const t = setTimeout(() => {
+      window.location.href = "/review";
+    }, 4000);
+    return () => clearTimeout(t);
+  }, [done]);
+
   function togglePlatform(id: string) {
     setPlatforms((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   }
@@ -79,7 +87,7 @@ export default function OnboardingPage() {
         <div className="glass relative max-w-lg w-full p-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg,#55705a,#3c4f40)" }}>🤖</div>
           <h1 className="grad-text mt-4 text-4xl">Got it — my turn</h1>
-          <p className="mt-2 text-sm text-muted">I&apos;m making your first 5 posts now. This takes under a minute.</p>
+          <p className="mt-2 text-sm text-muted">I&apos;m making your first 2 posts now. Taking you there…</p>
           <div className="mt-6">
             <a href="/review" className="btn-primary">See them appear →</a>
           </div>
