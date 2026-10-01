@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import VisualPreview from "@/components/VisualPreview";
 
 interface PendingItem {
   postId: string;
@@ -7,13 +8,96 @@ interface PendingItem {
   variants: Array<{ platform: string; caption: string; hashtags: string[] }>;
 }
 
-const PLATFORM_STYLE: Record<string, { icon: string; note: string }> = {
-  whatsapp: { icon: "💬", note: "WhatsApp style: short chat message" },
-  facebook: { icon: "📘", note: "Facebook style: fuller story" }
-};
+function VariantCard({ postId, v, businessName, onChanged }: {
+  postId: string;
+  v: PendingItem["variants"][number];
+  businessName: string;
+  onChanged: (caption: string, hashtags: string[]) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(v.caption);
+  const [aiNote, setAiNote] = useState("");
+  const [showAi, setShowAi] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function saveEdit() {
+    setBusy(true);
+    const res = await fetch("/api/review/variant", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId, platform: v.platform, caption: draft })
+    });
+    if (res.ok) {
+      onChanged(draft, v.hashtags);
+      setEditing(false);
+    }
+    setBusy(false);
+  }
+
+  async function aiEdit() {
+    if (!aiNote.trim()) return;
+    setBusy(true);
+    const res = await fetch("/api/review/variant", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId, platform: v.platform, instruction: aiNote.trim() })
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.ok && body.variant) {
+      onChanged(body.variant.caption, body.variant.hashtags ?? []);
+      setDraft(body.variant.caption);
+      setAiNote("");
+      setShowAi(false);
+    }
+    setBusy(false);
+  }
+
+  async function redo() {
+    setBusy(true);
+    const res = await fetch("/api/review/variant", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId, platform: v.platform })
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.ok && body.variant) {
+      onChanged(body.variant.caption, body.variant.hashtags ?? []);
+      setDraft(body.variant.caption);
+    }
+    setBusy(false);
+  }
+
+  return (
+    <div className="glass-soft p-4">
+      <p className="font-semibold">
+        {v.platform === "whatsapp" ? "💬 WhatsApp" : v.platform === "facebook" ? "📘 Facebook" : `📸 ${v.platform}`}
+        <span className="ml-2 font-normal text-muted">· written for {v.platform}</span>
+      </p>
+      {editing ? (
+        <textarea className="field mt-2" rows={4} value={draft} onChange={(e) => setDraft(e.target.value)} />
+      ) : (
+        <p className="mt-1 whitespace-pre-line text-sm text-muted">{v.caption}</p>
+      )}
+      {v.hashtags.length > 0 && <p className="mt-1 text-xs text-sky-700">{v.hashtags.join(" ")}</p>}
+      {showAi && (
+        <div className="mt-2 flex gap-2">
+          <input className="field !py-1.5 text-sm" value={aiNote} onChange={(e) => setAiNote(e.target.value)}
+            placeholder='Tell the AI what to change… e.g. "shorter and funnier"' />
+          <button onClick={aiEdit} disabled={busy} className="btn-primary shrink-0 !py-1.5 text-xs">Apply</button>
+        </div>
+      )}
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {editing
+          ? <><button onClick={saveEdit} disabled={busy} className="btn-primary !py-1 text-xs">Save</button>
+              <button onClick={() => { setDraft(v.caption); setEditing(false); }} className="btn-ghost !py-1 text-xs">Cancel</button></>
+          : <><button onClick={() => setEditing(true)} className="btn-ghost !py-1 text-xs">✏️ Edit</button>
+              <button onClick={() => setShowAi(!showAi)} className="btn-ghost !py-1 text-xs">✨ AI Edit</button>
+              <button onClick={redo} disabled={busy} className="btn-ghost !py-1 text-xs">🔄 Redo</button></>}
+      </div>
+    </div>
+  );
+}
 
 export default function ReviewPage() {
   const [items, setItems] = useState<PendingItem[]>([]);
+  const [businessName, setBusinessName] = useState("");
   const [msg, setMsg] = useState("Checking for posts the AI made for you…");
   const [busy, setBusy] = useState(false);
 
@@ -30,7 +114,7 @@ export default function ReviewPage() {
       const res = await fetch(`/api/review/pending?businessId=${businessId}`);
       const body = await res.json();
       if (body.offline) {
-        setMsg("You're offline — make a plan in Posts and approve it there.");
+        setMsg("You're offline — reconnect and your posts will appear here.");
         return;
       }
       setItems(body.items ?? []);
@@ -44,6 +128,12 @@ export default function ReviewPage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function patchVariant(postId: string, platform: string, caption: string, hashtags: string[]) {
+    setItems((prev) => prev.map((it) => it.postId === postId
+      ? { ...it, variants: it.variants.map((x) => x.platform === platform ? { ...x, caption, hashtags } : x) }
+      : it));
+  }
 
   async function approve(ids: string[]) {
     setBusy(true);
@@ -61,7 +151,8 @@ export default function ReviewPage() {
     setBusy(false);
   }
 
-  async function drop(postId: string) {
+  async function reject(postId: string) {
+    await fetch(`/api/review/post?postId=${postId}`, { method: "DELETE" }).catch(() => {});
     setItems(items.filter((i) => i.postId !== postId));
   }
 
@@ -85,29 +176,22 @@ export default function ReviewPage() {
           {items.map((item) => (
             <div key={item.postId} className="glass lift p-5">
               <p className="serif text-xl">{item.idea?.topic ?? "Untitled"}</p>
-              <p className="text-xs text-muted">Why this post: {item.idea?.angle} · Style: {item.idea?.format}</p>
+              <p className="text-xs text-muted">Why this post: {item.idea?.angle}</p>
+              {item.idea && (
+                <VisualPreview topic={item.idea.topic} angle={item.idea.angle} businessName={businessName || undefined} />
+              )}
               <div className="mt-3 grid gap-2">
                 {item.variants.map((v) => (
-                  <div key={v.platform} className="glass-soft p-3 text-sm">
-                    <p className="font-semibold">
-                      {PLATFORM_STYLE[v.platform]?.icon ?? "📣"} {v.platform}
-                      <span className="ml-2 font-normal text-muted">· {PLATFORM_STYLE[v.platform]?.note ?? "platform style"}</span>
-                    </p>
-                    <p className="mt-1 whitespace-pre-line text-muted">{v.caption}</p>
-                    {v.hashtags.length > 0 && <p className="mt-1 text-xs text-sky-700">{v.hashtags.join(" ")}</p>}
-                  </div>
+                  <VariantCard key={v.platform} postId={item.postId} v={v} businessName={businessName}
+                    onChanged={(caption, hashtags) => patchVariant(item.postId, v.platform, caption, hashtags)} />
                 ))}
               </div>
               <div className="mt-3 flex gap-2">
                 <button onClick={() => approve([item.postId])} disabled={busy} className="btn-primary !py-1.5 text-xs">Approve ✓</button>
-                <button onClick={() => drop(item.postId)} className="btn-ghost !py-1.5 text-xs">Skip</button>
+                <button onClick={() => reject(item.postId)} className="btn-ghost !py-1.5 text-xs">✕ Reject</button>
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="mt-4 text-center text-sm text-muted">
-          Want different posts? <a href="/autopilot" className="underline">Make a fresh plan →</a>
         </div>
       </div>
     </main>

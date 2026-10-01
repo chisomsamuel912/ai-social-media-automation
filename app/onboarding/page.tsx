@@ -1,67 +1,77 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { EMPTY_DRAFT, MVP_PLATFORMS, completeness, type OnboardingDraft } from "@/lib/onboarding";
 
-const STEPS = ["Business", "Audience", "Style", "Platforms", "Sales"];
-
-function field(label: string, node: React.ReactNode) {
-  return (
-    <label className="block">
-      <span className="text-sm font-medium">{label}</span>
-      <div className="mt-1.5">{node}</div>
-    </label>
-  );
-}
+const TONES = ["Friendly and simple", "Professional", "Playful", "Bold"];
+const PLATFORMS = [
+  { id: "instagram", label: "📸 Instagram" },
+  { id: "facebook", label: "📘 Facebook" },
+  { id: "whatsapp", label: "💬 WhatsApp" }
+];
 
 export default function OnboardingPage() {
   const { user } = useAuth();
-  const [draft, setDraft] = useState<OnboardingDraft>(EMPTY_DRAFT);
-  const [step, setStep] = useState(0);
-  const [status, setStatus] = useState<string>("");
-  const [doneId, setDoneId] = useState<string>("");
-  const [quick, setQuick] = useState(true);
-  const [goal, setGoal] = useState("Get more customers");
+  const [name, setName] = useState("");
+  const [sells, setSells] = useState("");
+  const [customers, setCustomers] = useState("");
+  const [tone, setTone] = useState(TONES[0]);
+  const [topics, setTopics] = useState("");
+  const [platforms, setPlatforms] = useState<string[]>(["instagram", "facebook"]);
+  const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("onboarding-draft");
-      if (raw) setDraft({ ...EMPTY_DRAFT, ...JSON.parse(raw) });
-    } catch {}
-  }, []);
-  useEffect(() => {
-    try {
-      localStorage.setItem("onboarding-draft", JSON.stringify(draft));
-    } catch {}
-  }, [draft]);
-
-  const set = (k: keyof OnboardingDraft, v: string | string[]) =>
-    setDraft((d) => ({ ...d, [k]: v }));
-  const score = completeness(draft);
-
-  async function submit() {
-    setStatus("Saving…");
-    const res = await fetch("/api/onboarding", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...draft, ownerId: user?.id })
-    });
-    const body = await res.json().catch(() => ({}));
-    if (res.ok) {
-      setDoneId(body.businessId);
-      try {
-        localStorage.setItem("business-id", body.businessId);
-        localStorage.removeItem("onboarding-draft");
-      } catch {}
-      setStatus("");
-    } else {
-      setStatus(body.error === "supabase-not-configured"
-        ? "Supabase keys missing — add them to .env, then retry. Draft kept."
-        : `Error: ${body.error ?? res.status}`);
-    }
+  function togglePlatform(id: string) {
+    setPlatforms((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   }
 
-  if (doneId) {
+  async function submit() {
+    if (name.trim().length < 2 || sells.trim().length < 3) {
+      setStatus("Just two things to start: your business name and what you sell.");
+      return;
+    }
+    if (platforms.length === 0) {
+      setStatus("Pick at least one platform.");
+      return;
+    }
+    setBusy(true);
+    setStatus("Saving…");
+    try {
+      const res = await fetch("/api/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          sells: sells.trim(),
+          customers: customers.trim(),
+          tone,
+          topics: topics.trim(),
+          platforms,
+          ownerId: user?.id
+        })
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setStatus(body.error === "supabase-not-configured"
+          ? "Database isn't connected yet — try again in a minute."
+          : `Something went wrong (${body.error ?? res.status}). Try again.`);
+        setBusy(false);
+        return;
+      }
+      try {
+        localStorage.setItem("business-id", body.businessId);
+      } catch {}
+      // The AI starts working immediately — no buttons needed.
+      setStatus("Got it — I'm making your first posts now…");
+      fetch("/api/cron/dispatch").catch(() => {});
+      setDone(true);
+    } catch {
+      setStatus("Couldn't reach the server. Check your connection and retry.");
+    }
+    setBusy(false);
+  }
+
+  if (done) {
     return (
       <main className="stage flex items-center justify-center px-4 py-14">
         <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#9CAF88" }} />
@@ -69,154 +79,66 @@ export default function OnboardingPage() {
         <div className="glass relative max-w-lg w-full p-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg,#55705a,#3c4f40)" }}>🤖</div>
           <h1 className="grad-text mt-4 text-4xl">Got it — my turn</h1>
-          <p className="mt-2 text-sm text-muted">I&apos;m making your first posts now. This takes a few seconds.</p>
+          <p className="mt-2 text-sm text-muted">I&apos;m making your first 5 posts now. This takes under a minute.</p>
           <div className="mt-6">
-            <a href="/autopilot?auto=1" className="btn-primary">Watch them appear →</a>
+            <a href="/review" className="btn-primary">See them appear →</a>
           </div>
-        </div>
-      </main>
-    );
-  }
-
-  async function quickStart() {
-    if (draft.name.trim().length < 2 || draft.products.trim().length < 3) {
-      setStatus("Just two things: your business name and what you sell.");
-      return;
-    }
-    setStatus("Saving…");
-    const res = await fetch("/api/onboarding", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...draft,
-        description: draft.products,
-        goals: goal,
-        ownerId: user?.id
-      })
-    });
-    const body = await res.json().catch(() => ({}));
-    if (res.ok) {
-      setDoneId(body.businessId);
-      try {
-        localStorage.setItem("business-id", body.businessId);
-        localStorage.removeItem("onboarding-draft");
-      } catch {}
-      setStatus("");
-    } else {
-      setStatus(body.error === "supabase-not-configured"
-        ? "Supabase keys missing — add them to .env, then retry."
-        : `Error: ${body.error ?? res.status}`);
-    }
-  }
-
-  if (quick) {
-    return (
-      <main className="stage flex items-center justify-center px-4 py-14">
-        <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#9CAF88" }} />
-        <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", bottom: "-160px", background: "#D9CFC0" }} />
-        <div className="glass relative w-full max-w-md p-8">
-          <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">30 seconds · then the AI takes over</p>
-          <h1 className="grad-text mt-1 text-center text-4xl">What&apos;s your business?</h1>
-          <div className="mt-6 grid gap-3">
-            <label className="block">
-              <span className="text-sm font-medium">Business</span>
-              <input className="field mt-1.5" value={draft.name} onChange={(e) => set("name", e.target.value)}
-                placeholder="Chinelo's Fashion" />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">Product</span>
-              <input className="field mt-1.5" value={draft.products} onChange={(e) => set("products", e.target.value)}
-                placeholder="Women's native dresses" />
-            </label>
-            <div>
-              <p className="text-sm font-medium">Goal</p>
-              <div className="mt-1.5 flex flex-wrap gap-1.5">
-                {["Get more customers", "Get more orders", "Grow my followers"].map((g) => (
-                  <button key={g} onClick={() => setGoal(g)} className={`pill ${goal === g ? "on" : ""}`}>{g}</button>
-                ))}
-              </div>
-            </div>
-            <button onClick={quickStart} className="btn-primary w-full py-3 text-base">Start my posts →</button>
-          </div>
-          {status && <p className="mt-3 text-center text-sm text-muted">{status}</p>}
-          <button onClick={() => setQuick(false)} className="mt-4 w-full text-center text-xs text-muted underline">
-            I prefer the detailed 5-step setup
-          </button>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="stage px-4 py-10">
+    <main className="stage flex items-center justify-center px-4 py-10">
       <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#9CAF88" }} />
-      <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", top: "20%", background: "#D9CFC0" }} />
-      <div className="orb orb-c" style={{ width: 380, height: 380, left: "30%", bottom: "-180px", background: "#C9D6E2" }} />
-
-      <div className="relative mx-auto max-w-xl">
-        <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">Setup once · under 3 minutes</p>
-        <h1 className="grad-text mt-1 text-center text-4xl">Tell us about your business</h1>
-
-        <div className="mt-5 flex justify-center gap-1.5 overflow-x-auto pb-1">
-          {STEPS.map((s, i) => (
-            <span key={s} className={`pill ${i === step ? "on" : i < step ? "done" : ""}`}>{i < step ? "✓ " : ""}{s}</span>
-          ))}
-        </div>
-
-        <div className="glass mt-4 p-6 sm:p-8">
-          <div className="h-1.5 overflow-hidden rounded-full" style={{ background: "#ECE9E2" }}>
-            <div className="h-full rounded-full transition-all" style={{ width: `${score}%`, background: "linear-gradient(90deg,#8A9B84,#4A5D4E)" }} />
+      <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", bottom: "-160px", background: "#D9CFC0" }} />
+      <div className="glass relative w-full max-w-md p-8">
+        <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">One time · 30 seconds</p>
+        <h1 className="grad-text mt-1 text-center text-4xl">Your business</h1>
+        <p className="mt-1 text-center text-sm text-muted">After this, the AI works on its own. You just review.</p>
+        <div className="mt-6 grid gap-4">
+          <label className="block">
+            <span className="text-sm font-medium">Business name</span>
+            <input className="field mt-1.5" value={name} onChange={(e) => setName(e.target.value)}
+              placeholder="Fashion Store" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium">What do you sell?</span>
+            <input className="field mt-1.5" value={sells} onChange={(e) => setSells(e.target.value)}
+              placeholder="Women's native dresses" />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium">Target customers</span>
+            <input className="field mt-1.5" value={customers} onChange={(e) => setCustomers(e.target.value)}
+              placeholder="Nigerian women aged 18–35" />
+          </label>
+          <div>
+            <p className="text-sm font-medium">Preferred tone</p>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {TONES.map((t) => (
+                <button key={t} onClick={() => setTone(t)} className={`pill ${tone === t ? "on" : ""}`}>{t}</button>
+              ))}
+            </div>
           </div>
-          <p className="mt-2 text-xs text-muted">Completeness {score}% · Step {step + 1} of 5</p>
-
-          <div className="mt-5 grid gap-4">
-            {step === 0 && (<>
-              {field("Business name *", <input className="field" value={draft.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Ada's Kitchen" />)}
-              {field("What do you do? *", <textarea className="field" rows={3} value={draft.description} onChange={(e) => set("description", e.target.value)} placeholder="Jollof catering and weekly meal prep in Lagos" />)}
-              {field("Products / services", <input className="field" value={draft.products} onChange={(e) => set("products", e.target.value)} placeholder="Party jollof, meal-prep plans" />)}
-            </>)}
-            {step === 1 && (<>
-              {field("Who are your customers? *", <input className="field" value={draft.audience} onChange={(e) => set("audience", e.target.value)} placeholder="Busy parents, 25–40" />)}
-              {field("Location", <input className="field" value={draft.location} onChange={(e) => set("location", e.target.value)} placeholder="Lagos, Nigeria" />)}
-            </>)}
-            {step === 2 && (<>
-              {field("Tone of voice", <select className="field" value={draft.tone} onChange={(e) => set("tone", e.target.value)}><option value="friendly">Friendly</option><option value="professional">Professional</option><option value="playful">Playful</option><option value="bold">Bold</option></select>)}
-              <div className="glass-soft p-3 text-xs text-muted">✨ The AI figures out topics and goals from your description and audience — no need to spell them out.</div>
-            </>)}
-            {step === 3 && (<>
-              <div><p className="text-sm font-medium">Platforms <span className="text-muted">(MVP: WhatsApp + Facebook)</span></p>
-                <div className="mt-2 grid gap-2">
-                  {MVP_PLATFORMS.map((p) => (
-                    <label key={p.id} className={`glass-soft flex items-center gap-2 px-3 py-2.5 text-sm ${p.enabled ? "" : "opacity-50"}`}>
-                      <input type="checkbox" disabled={!p.enabled} checked={draft.platforms.includes(p.id)}
-                        onChange={(e) => set("platforms", e.target.checked ? [...draft.platforms, p.id] : draft.platforms.filter((x) => x !== p.id))} />
-                      {p.label}{!p.enabled && <span className="text-xs text-muted">· later</span>}
-                    </label>
-                  ))}
-                </div></div>
-              {field("Posting frequency", <select className="field" value={draft.frequency} onChange={(e) => set("frequency", e.target.value)}><option value="let_ai_decide">Let AI decide (recommended)</option><option value="3">3 posts/week</option><option value="5">5 posts/week</option><option value="7">7 posts/week</option></select>)}
-              {field("Publishing mode", <select className="field" value={draft.publishingMode} onChange={(e) => set("publishingMode", e.target.value)}><option value="remind_me">🔔 Remind Me (MVP default)</option><option value="auto">⭐ Auto Publish (needs API approval)</option></select>)}
-            </>)}
-            {step === 4 && (<>
-              {field("Sales channel", <select className="field" value={draft.salesChannel} onChange={(e) => set("salesChannel", e.target.value)}><option value="whatsapp">WhatsApp</option><option value="facebook">Facebook Messenger</option><option value="website">Website / order page</option></select>)}
-              <div className="glass-soft p-4 text-sm">
-                <p className="font-semibold">Review</p>
-                <p className="text-muted">{draft.name || "—"} · {(draft.platforms.join(", ") || "—")} · {draft.frequency} · {draft.publishingMode} · → {draft.salesChannel}</p>
-              </div>
-            </>)}
+          <label className="block">
+            <span className="text-sm font-medium">Main topics <span className="font-normal text-muted">(optional, comma separated)</span></span>
+            <input className="field mt-1.5" value={topics} onChange={(e) => setTopics(e.target.value)}
+              placeholder="styling tips, new arrivals, fabrics" />
+          </label>
+          <div>
+            <p className="text-sm font-medium">Platforms</p>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {PLATFORMS.map((p) => (
+                <button key={p.id} onClick={() => togglePlatform(p.id)}
+                  className={`pill ${platforms.includes(p.id) ? "on" : ""}`}>{p.label}</button>
+              ))}
+            </div>
           </div>
-
-          {status && <p className="mt-4 text-sm text-muted">{status}</p>}
+          <button onClick={submit} disabled={busy} className="btn-primary w-full py-3 text-base">
+            {busy ? "Saving…" : "Start my posts →"}
+          </button>
         </div>
-
-        <div className="actionbar mt-4 flex items-center gap-2 p-2.5">
-          {step > 0
-            ? <button onClick={() => setStep(step - 1)} className="rounded-xl px-4 py-2 text-sm text-white/80">← Back</button>
-            : <span className="px-2 text-xs text-white/50">Step {step + 1}/5</span>}
-          {step < 4
-            ? <button onClick={() => setStep(step + 1)} className="btn-primary ml-auto">Continue →</button>
-            : <button onClick={submit} className="btn-primary ml-auto">Finish setup ✨</button>}
-        </div>
+        {status && <p className="mt-3 text-center text-sm text-muted">{status}</p>}
       </div>
     </main>
   );

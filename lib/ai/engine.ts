@@ -1,5 +1,4 @@
 import { adaptMany } from "./adapters";
-import { applyBoosts } from "../learner";
 import { getProvider, type ContentIdea, type Platform, type Variant } from "./provider";
 
 export const MVP_ENGINE_PLATFORMS = ["whatsapp", "facebook"] as Platform[];
@@ -62,7 +61,6 @@ export async function planContent(args: {
   salesChannel?: string;
   historyKeys?: string[];
   factCount?: number;
-  boosts?: Record<string, number>;
 }): Promise<{ ideas: PlannedIdea[]; blocked: number }> {
   const count = Math.min(Math.max(args.count ?? 5, 1), 7);
   const platforms = args.platforms ?? MVP_ENGINE_PLATFORMS;
@@ -70,9 +68,8 @@ export async function planContent(args: {
   const raw = await provider.plan({ businessName: args.businessName, guide: args.guide, count });
   const rotated = enforceRotation(raw);
   const { fresh, blocked } = dedupeIdeas(rotated, args.historyKeys ?? []);
-  const ordered = applyBoosts(fresh, args.boosts ?? {});
   const ideas: PlannedIdea[] = [];
-  for (const idea of ordered) {
+  for (const idea of fresh) {
     const variants: Variant[] = [];
     for (const p of platforms) {
       variants.push(await provider.generate(idea, p));

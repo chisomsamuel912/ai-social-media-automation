@@ -6,26 +6,20 @@ import { clientKey, rateLimit } from "@/lib/ratelimit";
 
 const Body = z.object({
   ownerId: z.string().uuid().optional(),
-  name: z.string().min(2),
-  description: z.string().default(""),
-  products: z.string().default(""),
-  audience: z.string().default(""),
-  location: z.string().default(""),
-  tone: z.string().default("friendly"),
-  topics: z.string().default(""),
-  avoidTopics: z.string().default(""),
-  goals: z.string().default(""),
-  platforms: z.array(z.string()).default(["whatsapp", "facebook"]),
-  frequency: z.string().default("let_ai_decide"),
-  publishingMode: z.string().default("remind_me"),
-  salesChannel: z.string().default("whatsapp")
+  name: z.string().min(2).max(120),
+  sells: z.string().min(3).max(300),
+  customers: z.string().max(300).default(""),
+  tone: z.string().max(60).default("Friendly and simple"),
+  topics: z.string().max(300).default(""),
+  platforms: z.array(z.string()).min(1).max(5).default(["instagram", "facebook"])
 });
 
+/** First-time business setup — the main manual step. Everything after is automatic. */
 export async function POST(req: Request) {
-  if (!rateLimit(`onboarding:${clientKey(req)}`, 5, 60_000)) return tooMany("Onboarding is throttled");
+  if (!rateLimit(`onboarding:${clientKey(req)}`, 5, 60_000)) return tooMany("Setup is throttled");
   if (!isSupabaseConfigured()) {
     return NextResponse.json(
-      { error: "supabase-not-configured", hint: "Add Supabase keys to .env, then retry." },
+      { error: "supabase-not-configured", hint: "Database isn't connected yet." },
       { status: 503 }
     );
   }
@@ -37,28 +31,28 @@ export async function POST(req: Request) {
   const db = getServiceClient();
   if (!db) return NextResponse.json({ error: "supabase-not-configured" }, { status: 503 });
 
+  const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
   const { data: biz, error: bizErr } = await db
     .from("businesses")
     .insert({
       owner_id: b.ownerId ?? null,
       name: b.name,
-      description: b.description,
-      sales_channels: [b.salesChannel],
-      publishing_mode: b.publishingMode,
-      posting_frequency: b.frequency
+      description: b.sells,
+      sales_channels: [],
+      publishing_mode: "remind_me",
+      posting_frequency: "let_ai_decide"
     })
     .select("id")
     .single();
   if (bizErr || !biz) return NextResponse.json({ error: "db-error", detail: bizErr?.message }, { status: 500 });
 
-  const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
   await db.from("content_profiles").insert({
     business_id: biz.id,
-    audience_json: { audience: b.audience, location: b.location, platforms: b.platforms },
+    audience_json: { customers: b.customers, platforms: b.platforms },
     tone: b.tone,
     topics: csv(b.topics),
-    avoid_topics: csv(b.avoidTopics),
-    goals: csv(b.goals)
+    avoid_topics: [],
+    goals: []
   });
   await db.from("brands").insert({ business_id: biz.id });
   await audit("onboarding", "business created", { businessId: biz.id });

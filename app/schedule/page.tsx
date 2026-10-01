@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { buildCopyPack, type QueueItem } from "@/lib/scheduling";
-import { loadQueue } from "@/components/PlanResults";
+import { buildCopyPack } from "@/lib/scheduling";
+import { loadQueue, saveQueue, type QueueItem } from "@/lib/queue";
 
 function toLocalInput(iso: string): string {
   const d = new Date(iso);
@@ -26,9 +26,7 @@ export default function SchedulePage() {
 
   function save(q: QueueItem[]) {
     setQueue(q);
-    try {
-      localStorage.setItem("schedule-queue", JSON.stringify(q));
-    } catch {}
+    saveQueue(q);
   }
 
   function retime(key: string, local: string) {
@@ -91,6 +89,31 @@ export default function SchedulePage() {
           </div>
         )}
 
+        {upcoming.length > 0 && (
+          <div className="glass mt-6 overflow-x-auto p-2">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs text-muted">
+                  <th className="px-3 py-2">Post</th><th className="px-3 py-2">Platform</th>
+                  <th className="px-3 py-2">Date</th><th className="px-3 py-2">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {upcoming.map((item) => {
+                  const d = new Date(item.scheduledAt);
+                  return (
+                    <tr key={item.key} className="border-t" style={{ borderColor: "#ECE7DA" }}>
+                      <td className="px-3 py-2 font-medium">{item.topic}</td>
+                      <td className="px-3 py-2 capitalize">{item.platform}</td>
+                      <td className="px-3 py-2">{d.toLocaleDateString([], { weekday: "long" })}</td>
+                      <td className="px-3 py-2 num">{d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
         {upcoming.length > 0 && <p className="mt-6 text-sm font-semibold">Scheduled ({upcoming.length})</p>}
         <div className="mt-2 grid gap-3">
           {upcoming.map((item) => {

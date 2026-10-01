@@ -80,7 +80,7 @@ export default function LoginPage() {
               </button>
             </p>
             <p className="mt-2 text-center text-sm">
-              <a href="/start" className="font-semibold underline">Just want posts? Try it instantly — no account →</a>
+              <a href="/onboarding" className="font-semibold underline">New here? Set up your business to begin →</a>
             </p>
           </>
         )}
