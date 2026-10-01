@@ -1,167 +1,309 @@
-# PRD — AI Social Media Growth & Automation Platform
+# Product Requirements Document (PRD)
 
-Source: `AI SOCIAL MEDIA GROWTH &AUTOMATION PLATFRORM.md` (full MVP product definition).
-Status: Planning document for assessment Task 1. No application build is performed in this task.
+## AI Social Media Assistant — Beginner-Friendly MVP
 
----
+### 1. Product
 
-## 1. Product Overview
+An AI-powered social media assistant for small businesses.
 
-The AI Social Media Growth & Automation Platform is an AI-powered social media assistant for businesses that cannot afford a social media manager. Instead of the owner acting as strategist, writer, designer, scheduler, publisher, and analyst, the AI handles the content work end to end.
+The app helps a business create and manage social media content automatically, so the owner does not have to think of what to post every day.
 
-Core promise: **Give the AI direction once. Let it handle the content work.**
+### 2. Problem
 
-Product philosophy: **powerful behind the scenes, extremely simple for the business owner.** The owner sets up a business/content profile once, reviews AI-generated posts, approves them, and lets the system schedule, publish (or remind), monitor performance, learn what works, handle routine customer comments, detect leads, and follow up within safeguards.
+Small business owners often struggle with:
 
-Positioning: not "an AI that writes captions" but **an AI social-media employee** — it remembers the business, plans content, creates posts and matching visuals, adapts them per platform, publishes, watches results, learns, handles simple customer interactions, identifies leads, and follows up. The owner mainly does: set direction → review → approve.
+* Knowing what to post
+* Writing good captions
+* Creating attractive visuals
+* Posting consistently
+* Remembering when to post
+* Creating different content instead of repeating the same thing
 
----
+Many owners are busy running their businesses and do not have time to manage social media manually.
 
-## 2. The Problem
+### 3. Solution
 
-Small businesses depend on social media for awareness, engagement, leads, and sales, but they:
+The owner gives the app their business information **once during setup**.
 
-- Don't know what to post consistently and repeat the same ideas.
-- Spend too much time creating content (captions, images, videos).
-- Don't know how to adapt one idea to different platforms.
-- Forget to post and don't know what performs well.
-- Struggle to create good visuals and to respond to customers consistently.
-- Lose potential customers who show interest but never get a follow-up.
-- Can't afford to hire a social media manager.
+After that, the AI works automatically.
 
-Existing AI tools generate captions, but the owner still has to do every other job. This product removes that workload rather than adding another tool to it.
+The AI:
 
----
+* Plans what the business should post
+* Chooses different topics and content ideas
+* Writes the posts
+* Creates matching visuals
+* Organizes the posts into a schedule
+* Avoids unnecessary repetition
 
-## 3. Target Users
+The owner only needs to **review and approve the content**.
 
-Primary: small business owners, creators, and service businesses that rely on social media for awareness, engagement, leads, sales, and customer communication.
+### 4. Main User Journey
 
-Examples: fashion, restaurants, beauty, coaches, consultants, online stores, service providers, personal brands, local businesses, education, finance creators, real estate.
+**Sign Up → Business Setup → AI Works Automatically → Content Ready → Review → Approve → Schedule/Post**
 
-The product supports many niches through one mechanism: each business's Content Profile makes the AI behave specifically for that business.
-
----
-
-## 4. Main User Journey
-
-**Setup once:** Business Profile → Content Profile → Brand → Platforms → Sales Channel.
-The owner provides business info, audience, tone/topics, platforms, posting frequency (default: let AI decide), publishing mode (Auto Publish / Remind Me), sales channel (e.g. WhatsApp), and key business facts such as prices.
-
-**Then repeatedly (Auto Pilot loop):**
-
-Business Profile → AI understands business → AI plans content → AI creates posts → AI creates matching visuals → AI adapts content for platforms → User reviews → User approves → AI schedules/publishes → AI monitors performance → AI learns → AI improves future content → AI handles relevant comments/leads → AI follows up when appropriate → Repeat.
-
-A second entry point, **Create Content**, lets the owner start from something specific ("new product", "discount", "event") and the AI turns it into platform-ready posts. This loop is the heart of the product: success means moving the owner from "I need to post something" to "my social media is being handled."
+There should be no regular requirement for the owner to enter topics or click "Create Content."
 
 ---
 
-## 5. Ordered Implementation Phases
+# 5. MVP Features
 
-### Phase 1 — Project Foundation
+## Feature 1 — First-Time Business Setup
 
-Concrete outputs:
+This is the main manual setup.
 
-- Next.js + TypeScript project scaffold with Tailwind CSS styling.
-- Local Postgres database with initial schema migrations (businesses, profiles, posts).
-- Health-check API route (`/api/health`) proving app + database boot locally.
-- Lint, type-check, unit-test, and CI configuration.
+The owner provides:
 
-### Phase 2 — Business/Content Profile
+* Business name
+* What the business sells
+* Target customers
+* Preferred tone
+* Main business topics
+* Social media platforms
 
-Concrete outputs:
+Example:
 
-- Onboarding flow capturing business info, audience, tone, platforms, frequency, publishing mode, and sales channel.
-- Brand store (logo, colors, styles) plus media library for the business's own photos/videos.
-- Verified-facts store (prices, products, policies) that the AI must use instead of inventing facts.
-- Profile completeness scoring.
+> Business: Fashion Store
+> Customers: Nigerian women aged 18–35
+> Tone: Friendly and simple
+> Platforms: Instagram, Facebook
 
-### Phase 3 — AI Content Planning and Generation
-
-Concrete outputs:
-
-- Planner producing weekly content ideas (topic, angle, format, content pillar) with format rotation and promotion capped at a healthy share.
-- Platform adapters producing native versions per platform (e.g. short chat-style WhatsApp posts, fuller Facebook posts) — never copy-paste.
-- Content memory with duplicate prevention (no repeated topic + angle within the window).
-- Promo guardrail: promotional claims without verified facts are flagged, never invented.
-- Provider-agnostic AI interface so models can be swapped without rewrites.
-
-### Phase 4 — Content Review
-
-Concrete outputs:
-
-- Review screen showing each post with its visual, caption, and suggested time.
-- Per-post actions: regenerate, AI edit, manual edit, reject, change format.
-- Missing-information banners ("add price or create without it").
-- Approve-all action moving approved posts to scheduling.
-
-### Phase 5 — Scheduling and Publishing
-
-Concrete outputs:
-
-- AI-suggested posting times (per platform, audience, and history) editable by the owner.
-- Schedule queue with idempotent dispatch (retries never double-post).
-- Auto Publish mode plus Remind Me mode (reminder + copy pack when official APIs are unavailable).
-- Manual metrics entry for published posts.
-
-### Phase 6 — Performance and Learning
-
-Concrete outputs:
-
-- Results dashboard (views, likes, comments, leads) from logged metrics.
-- Learning job aggregating performance by format/topic into stored insights.
-- Planner weighting shifted toward proven winners ("Analytics → Learning → Better future content").
-- Trend/event fit-check so only fitting trends enter the plan.
-
-### Phase 7 — Comments, Leads and Customer Follow-Up
-
-Concrete outputs:
-
-- Comment inbox with lead detection (buying-intent scoring and 🔥 lead cards).
-- Facts-only reply drafting (thanks answered warmly, fact-covered questions quoted, everything else escalated to the owner — the AI never invents answers).
-- Follow-up scheduler (capped frequency, stops on purchase/opt-out).
-- Minimal customer memory with delete-on-request.
+The AI uses this information to understand the business.
 
 ---
 
-## 6. Technology Stack
+## Feature 2 — Automatic Content Planning
 
-- **Frontend framework:** Next.js 14 (App Router) with React 18, TypeScript, and Tailwind CSS.
-- **Database:** Postgres (relational tables for businesses, profiles, posts, metrics, inbox; accessed via SQL migrations, no ORM required for the MVP slice).
-- **Authentication:** Supabase Auth (email + password sign-up/login, guest/anonymous sign-in, Google OAuth optional) with owner-scoped row-level security.
-- **File/media storage:** Supabase Storage buckets (`brand-assets`, `uploads`, `generated-templates`); URL-based media library works without uploads.
+After setup, the AI automatically creates a content plan.
 
-**Local-first statement:** for this assessment the application and the database run locally — the Next.js dev server on the local machine against a local Postgres database. No cloud deployment is required, and the repository contains no real passwords, API keys, access tokens, or private credentials (secrets live only in a gitignored local `.env`, with a placeholder `.env.example` committed instead).
+The owner does **not** need to tell the AI what to post.
+
+The AI can decide things such as:
+
+* Educational posts
+* Product-related posts
+* Tips
+* Questions
+* Stories
+* Promotions
+* Helpful information
+* Engagement posts
+
+The AI should also try different angles so the content does not feel repetitive.
+
+Example:
+
+**Monday:** Fashion tip
+**Tuesday:** Product showcase
+**Wednesday:** Styling advice
+**Thursday:** Question for followers
+**Friday:** Promotional post
+
+The owner does not have to create this plan manually.
 
 ---
 
-## Agent Steering Decision — Authentication
+## Feature 3 — Automatic Post Creation
 
-1. **The original choice.** Supabase Auth (email + password, anonymous/guest sign-in, optional Google OAuth), with owner-scoped row-level security in Postgres.
+The AI turns the content ideas into actual social media posts.
 
-2. **The alternative considered.** Better Auth — a lightweight authentication library that runs inside the Next.js app and stores users and sessions directly in our own local Postgres database (email/password + anonymous + OAuth providers, no external service).
+For each planned post, the AI creates:
 
-3. **The decision we made.** Use **Better Auth** for this local prototype.
+* Caption/text
+* Appropriate format
+* Platform-appropriate version
 
-4. **Why we made that decision.**
-   - **Local development:** Better Auth runs entirely locally with zero external dependencies. Supabase Auth needs either a cloud project (breaks the local-only rule) or a self-hosted Supabase stack via Docker (heavy: many containers, slow, fragile on a laptop).
-   - **Simplicity and setup complexity:** Better Auth is one library, one API route, and a few tables in the database we already own. Supabase Auth means provisioning and configuring a whole second system before login works.
-   - **Stack compatibility:** with Next.js + plain local Postgres, Better Auth plugs straight into our tables and migrations. Supabase Auth fits best when the whole backend already lives on Supabase cloud, which is not this stage.
-   - **Need in this prototype:** a single-user local prototype barely needs auth at all, so auth must be minimal — anonymous/guest plus email/password covers the PRD's login promise without ceremony.
-   - **Upgrade path:** nothing is thrown away. Better Auth is production-grade, so growth means adding providers (Google, passkeys) and organizations, not rebuilding.
-
-5. **What we will use later if the project grows.** Keep Better Auth and extend it (more OAuth providers, passkeys, team/organization support). Only switch to Supabase Auth if the project standardizes on Supabase cloud hosting — that migration means moving user rows over and reworking row-level security around the new issuer, so it is deferred until the hosting decision is made.
+The owner does not need to write the captions.
 
 ---
 
-## Design Refinement Note
+## Feature 4 — Automatic Visual Creation
 
-- **The original design approach.** `design.html` v1 used Georgia serif headings with system sans body, a warm paper/moss/sage/amber palette, gradient primary buttons, and soft-bordered inputs — clean but with a flat heading hierarchy, muted-on-paper small text, and a light placeholder that was hard to read.
-- **The specific refinement requested.** Improve typography and readability only: clearer scannable headings, stronger heading/body/supporting distinction, and an easy-to-read sample input — keeping the palette and layout.
-- **Why the refinement was made.** Small business owners scan rather than read; the original headings, body, and captions were too close in size and weight, and low-contrast small text plus a pale placeholder hurt readability.
-- **What changed in design.html.**
-  - Hero heading enlarged (38–60px), tighter tracking, balanced line breaks; lede set in full ink at 18px/1.7 instead of muted 17px.
-  - Numbered section kickers added ("01 · Colors" …) above larger 28px section headings; section spacing increased.
-  - Type scale separated: display 34px serif / section 23px serif / body 16px at 1.75 line-height / captions 13px.
-  - Two minimal contrast adjustments (palette otherwise untouched): supporting captions moved from stone `#6E675C` to `#5F594E`, and input placeholders from pale `#A39B8C` to stone `#6E675C` at full opacity.
-  - Input enlarged to 16px on white with a 2px border and roomier padding for legibility.
+The AI creates a visual that matches the post.
+
+For the MVP, this can focus mainly on:
+
+* Images
+* Simple graphics
+* Product-style visuals
+
+The AI decides what type of visual fits the post.
+
+More advanced video generation can be added later.
+
+---
+
+## Feature 5 — Content Review
+
+This is the main regular action the owner performs.
+
+When content is ready, the owner receives something like:
+
+> **Your weekly content is ready 🎉**
+> 5 posts are waiting for your review.
+
+The owner can:
+
+* **Approve**
+* **Edit**
+* **AI Edit**
+* **Redo**
+* **Reject**
+* **Approve All**
+
+The owner can look through the posts before anything is published.
+
+---
+
+## Feature 6 — Automatic Scheduling
+
+After the owner approves the content, the app schedules the posts.
+
+The AI can choose suitable posting times based on the business's selected platforms.
+
+The owner can change a date or time if they want.
+
+The basic schedule should show:
+
+| Post         | Platform  | Date      | Time     |
+| ------------ | --------- | --------- | -------- |
+| Fashion Tip  | Instagram | Monday    | 10:00 AM |
+| Product Post | Facebook  | Tuesday   | 1:00 PM  |
+| Styling Tip  | Instagram | Wednesday | 11:00 AM |
+
+---
+
+## Feature 7 — Content History
+
+The app remembers previously created content.
+
+This helps the AI avoid repeatedly creating the exact same type of post.
+
+For example:
+
+If the AI already created:
+
+> "5 ways to style a black dress"
+
+it should be able to create a different idea later instead of simply repeating it.
+
+---
+
+# 6. What the Owner Does Manually
+
+### During first-time setup:
+
+The owner provides their business information.
+
+### Every week:
+
+The owner mainly:
+
+**Reviews → Approves**
+
+That's it.
+
+They can edit or redo something if they don't like it, but these actions are optional.
+
+### The owner should NOT have to:
+
+* Enter a topic every week
+* Think of post ideas
+* Write captions
+* Create images
+* Build a content calendar
+* Tell the AI what to post every day
+* Click "Create Content" every week
+
+---
+
+# 7. MVP Product Promise
+
+> **Set up your business once. Your AI creates your social media content automatically. You simply review and approve it.**
+
+---
+
+# 8. What We Are NOT Building Yet
+
+To keep the first version simple, these features will come later:
+
+* Automatic comment replies
+* Customer/lead detection
+* Customer follow-ups
+* CRM
+* Advanced analytics
+* AI learning from performance
+* Competitor research
+* Trend detection
+* Advanced video generation
+* Customer memory
+* Multiple businesses
+* Team accounts
+* Payments and subscriptions
+* Advanced campaigns
+* Sales conversations
+* WhatsApp/Instagram DM automation
+
+These are future features, not part of the first version.
+
+---
+
+# 9. Future Version
+
+Later, the app can become a more complete AI social media manager.
+
+Possible future abilities:
+
+* Learn from which posts perform well
+* Create better videos
+* Understand trends
+* Help respond to comments
+* Detect potential customers
+* Help businesses follow up with leads
+* Connect to WhatsApp and other sales channels
+* Provide analytics
+* Remember more about the business and its brand
+
+But these should **not** make the first version complicated.
+
+---
+
+# 10. Simple MVP Flow
+
+**STEP 1:** User signs up
+
+↓
+
+**STEP 2:** User tells the AI about their business
+
+↓
+
+**STEP 3:** AI automatically plans content
+
+↓
+
+**STEP 4:** AI automatically creates posts and visuals
+
+↓
+
+**STEP 5:** Content appears in the Review section
+
+↓
+
+**STEP 6:** Owner reviews and approves
+
+↓
+
+**STEP 7:** App schedules/publishes approved content
+
+↓
+
+**STEP 8:** AI remembers previous content and prepares the next batch automatically
+
+---
+
+## The Core Idea
+
+The app should feel like this:
+
+> **"I told the AI about my business once. Now it handles my social media content, and I only check what it created before it goes out."**
