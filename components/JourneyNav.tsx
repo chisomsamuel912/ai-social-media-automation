@@ -22,7 +22,7 @@ export default function JourneyNav() {
           return (
             <a key={s.href} href={s.href}
               className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium ${active ? "text-white" : "text-muted"}`}
-              style={active ? { background: "#1F2A22" } : { background: "transparent" }}>
+              style={active ? { background: "#232A4D" } : { background: "transparent" }}>
               {s.label}
             </a>
           );

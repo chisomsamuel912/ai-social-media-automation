@@ -3,10 +3,10 @@ import { escapeXml, renderVisual } from "../lib/templates";
 
 describe("template renderer ($0, no API)", () => {
   it("renders an image slide containing headline + brand color", () => {
-    const [svg] = renderVisual({ format: "image", headline: "Save ₦5k weekly", businessName: "TestCo", colors: ["#15803D"] });
+    const [svg] = renderVisual({ format: "image", headline: "Save ₦5k weekly", businessName: "TestCo", colors: ["#0F766E"] });
     expect(svg).toContain("<svg");
     expect(svg).toContain("Save");
-    expect(svg).toContain("#15803D");
+    expect(svg).toContain("#0F766E");
   });
   it("renders 3 carousel slides", () => {
     const slides = renderVisual({ format: "carousel", headline: "Tip one, tip two, tip three" });

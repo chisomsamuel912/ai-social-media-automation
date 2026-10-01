@@ -4,12 +4,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: "#F2F7F2",
+        paper: "#F6F1E7",
         card: "#FFFFFF",
-        sand: "#E3EDE3",
-        moss: "#15803D",
-        ink: "#1F2A22",
-        muted: "#55685A"
+        sand: "#EAE0C6",
+        moss: "#0F766E",
+        ink: "#232A4D",
+        muted: "#5C6470"
       },
       borderRadius: { xl2: "14px" }
     }

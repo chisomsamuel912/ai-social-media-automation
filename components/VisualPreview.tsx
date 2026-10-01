@@ -57,7 +57,7 @@ export default function VisualPreview({ topic, angle, businessName, order = 0 }:
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={aiImage} alt={topic} className="h-auto w-full" />
-            <span className="pill absolute left-2 top-2" style={{ background: "rgba(43,41,38,.8)", color: "#fff", border: "none" }}>✨ AI picture</span>
+            <span className="pill absolute left-2 top-2" style={{ background: "rgba(35,42,77,.8)", color: "#fff", border: "none" }}>✨ AI picture</span>
           </div>
         ) : (
           <>
@@ -72,7 +72,7 @@ export default function VisualPreview({ topic, angle, businessName, order = 0 }:
             {slides.map((_, i) => (
               <button key={i} onClick={() => setSlide(i)} aria-label={`Slide ${i + 1}`}
                 className="h-2 rounded-full transition-all"
-                style={{ width: i === slide ? 22 : 8, background: i === slide ? "#1F2A22" : "rgba(43,41,38,.3)" }} />
+                style={{ width: i === slide ? 22 : 8, background: i === slide ? "#232A4D" : "rgba(35,42,77,.3)" }} />
             ))}
           </div>
         )}

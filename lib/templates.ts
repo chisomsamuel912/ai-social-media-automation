@@ -14,11 +14,11 @@ export function escapeXml(s: string): string {
 
 function palette(colors?: string[]) {
   return {
-    bg: colors?.[0] ?? "#15803D",
-    bg2: colors?.[1] ?? "#166534",
+    bg: colors?.[0] ?? "#0F766E",
+    bg2: colors?.[1] ?? "#115E59",
     paper: "#FFFFFF",
-    ink: "#1F2A22",
-    muted: "#55685A"
+    ink: "#232A4D",
+    muted: "#5C6470"
   };
 }
 

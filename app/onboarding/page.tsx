@@ -87,10 +87,10 @@ export default function OnboardingPage() {
   if (done) {
     return (
       <main className="stage flex items-center justify-center px-4 py-14">
-        <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#7CC48A" }} />
-        <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", bottom: "-160px", background: "#C9E2CF" }} />
+        <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#5EEAD4" }} />
+        <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", bottom: "-160px", background: "#F2C078" }} />
         <div className="glass relative max-w-lg w-full p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg,#16A34A,#166534)" }}>🤖</div>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: "linear-gradient(135deg,#14B8A6,#115E59)" }}>🤖</div>
           <h1 className="grad-text mt-4 text-4xl">Got it — my turn</h1>
           <p className="mt-2 text-sm text-muted">I&apos;m making your first 2 posts now. Taking you there…</p>
           <div className="mt-6">
@@ -103,8 +103,8 @@ export default function OnboardingPage() {
 
   return (
     <main className="stage flex items-center justify-center px-4 py-10">
-      <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#7CC48A" }} />
-      <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", bottom: "-160px", background: "#C9E2CF" }} />
+      <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#5EEAD4" }} />
+      <div className="orb orb-b" style={{ width: 480, height: 480, right: "-140px", bottom: "-160px", background: "#F2C078" }} />
       <div className="glass relative w-full max-w-md p-8">
         <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">One time · 30 seconds</p>
         <h1 className="grad-text mt-1 text-center text-4xl">Your business</h1>
