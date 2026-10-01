@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pick your colors</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#F1EFE9;color:#2B2926;padding:32px 20px}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font-family:Georgia,serif;font-size:34px;text-align:center}
+  p.sub{text-align:center;color:#6E675C;margin:6px 0 24px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .opt{border-radius:18px;padding:22px;border:2px solid transparent}
+  .opt h2{font-family:Georgia,serif;font-size:24px;margin-bottom:2px}
+  .opt p{font-size:14px;margin-bottom:12px}
+  .row{display:flex;gap:8px;margin-bottom:14px}
+  .sw{flex:1;height:46px;border-radius:10px}
+  .btn{display:inline-block;font-weight:700;font-size:15px;border:none;border-radius:12px;padding:12px 26px;cursor:pointer}
+  .pick{margin-top:12px;font-size:13px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Which feels like your business?</h1>
+  <p class="sub">Same app, four moods. Tell me A, B, C, or keep D.</p>
+  <div class="grid">
+    <div class="opt" style="background:#FAF5EA;color:#2E2A24">
+      <h2>A · Honey Morning</h2><p>Warm, friendly market-day feeling</p>
+      <div class="row"><span class="sw" style="background:#B45309"></span><span class="sw" style="background:#E8B04B"></span><span class="sw" style="background:#FAF5EA;border:1px solid #E3DED2"></span><span class="sw" style="background:#2E2A24"></span></div>
+      <button class="btn" style="background:#B45309;color:#fff">Approve all →</button>
+      <p class="pick">Reply A for this one</p>
+    </div>
+    <div class="opt" style="background:#F2F7F2;color:#1F2A22">
+      <h2>B · Fresh Leaf</h2><p>Clean, lively, growing-business green</p>
+      <div class="row"><span class="sw" style="background:#15803D"></span><span class="sw" style="background:#38BDF8"></span><span class="sw" style="background:#F2F7F2;border:1px solid #D8E2D8"></span><span class="sw" style="background:#1F2A22"></span></div>
+      <button class="btn" style="background:#15803D;color:#fff">Approve all →</button>
+      <p class="pick">Reply B for this one</p>
+    </div>
+    <div class="opt" style="background:#FDF3EC;color:#33261E">
+      <h2>C · Grape Charm</h2><p>Bold and pretty — fashion &amp; beauty energy</p>
+      <div class="row"><span class="sw" style="background:#7C3AED"></span><span class="sw" style="background:#F0A6C0"></span><span class="sw" style="background:#FDF3EC;border:1px solid #EADBCB"></span><span class="sw" style="background:#33261E"></span></div>
+      <button class="btn" style="background:#7C3AED;color:#fff">Approve all →</button>
+      <p class="pick">Reply C for this one</p>
+    </div>
+    <div class="opt" style="background:#F4F2ED;color:#2B2926">
+      <h2>D · Keep current</h2><p>Soft moss + paper (what you have now)</p>
+      <div class="row"><span class="sw" style="background:#4A5D4E"></span><span class="sw" style="background:#8A9B84"></span><span class="sw" style="background:#F4F2ED;border:1px solid #E3DED2"></span><span class="sw" style="background:#2B2926"></span></div>
+      <button class="btn" style="background:#4A5D4E;color:#fff">Approve all →</button>
+      <p class="pick">Reply D to keep it</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

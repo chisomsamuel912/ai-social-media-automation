@@ -176,7 +176,7 @@ export default function ReviewPage() {
 
   return (
     <main className="stage px-4 py-10">
-      <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-90px", background: "#9CAF88" }} />
+      <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-90px", background: "#7CC48A" }} />
       <div className="relative mx-auto max-w-2xl">
         <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">Step 2 · Your call</p>
         <h1 className="grad-text mt-1 text-center text-4xl">Posts waiting for you</h1>

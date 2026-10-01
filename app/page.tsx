@@ -14,7 +14,7 @@ function LoopStep({ n, title, desc, href, done }: { n: string; title: string; de
   return (
     <a href={href} className="glass-soft lift block p-4">
       <p className="flex items-center gap-2 font-semibold">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-white" style={{ background: done ? "#4A5D4E" : "#B9B2A4" }}>
+        <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-white" style={{ background: done ? "#15803D" : "#A9BFAE" }}>
           {done ? "✓" : n}
         </span>
         {title}
@@ -90,8 +90,8 @@ export default function Page() {
 
   return (
     <main className="stage">
-      <div className="orb" style={{ width: 460, height: 460, left: "-140px", top: "-120px", background: "#9CAF88" }} />
-      <div className="orb orb-b" style={{ width: 520, height: 520, right: "-160px", top: "10%", background: "#D9CFC0" }} />
+      <div className="orb" style={{ width: 460, height: 460, left: "-140px", top: "-120px", background: "#7CC48A" }} />
+      <div className="orb orb-b" style={{ width: 520, height: 520, right: "-160px", top: "10%", background: "#C9E2CF" }} />
       <div className="relative mx-auto max-w-4xl px-6 py-14">
         <div className="flex justify-end">
           <SessionChip />

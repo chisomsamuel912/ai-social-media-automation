@@ -75,7 +75,7 @@ export default function SchedulePage() {
 
   return (
     <main className="stage px-4 py-10">
-      <div className="orb" style={{ width: 400, height: 400, left: "-120px", top: "-80px", background: "#D9CFC0" }} />
+      <div className="orb" style={{ width: 400, height: 400, left: "-120px", top: "-80px", background: "#C9E2CF" }} />
       <div className="relative mx-auto max-w-2xl">
         <p className="text-center text-xs font-medium uppercase tracking-widest text-muted">📅 Schedule · Remind Me</p>
         <h1 className="grad-text mt-1 text-center text-4xl">Upcoming posts</h1>
@@ -115,7 +115,7 @@ export default function SchedulePage() {
                 {upcoming.map((item) => {
                   const d = new Date(item.scheduledAt);
                   return (
-                    <tr key={item.key} className="border-t" style={{ borderColor: "#ECE7DA" }}>
+                    <tr key={item.key} className="border-t" style={{ borderColor: "#E2EAE2" }}>
                       <td className="px-3 py-2 font-medium">{item.topic}</td>
                       <td className="px-3 py-2 capitalize">{item.platform}</td>
                       <td className="px-3 py-2">{d.toLocaleDateString([], { weekday: "long" })}</td>

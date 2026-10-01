@@ -72,7 +72,7 @@ export default function VisualPreview({ topic, angle, businessName, order = 0 }:
             {slides.map((_, i) => (
               <button key={i} onClick={() => setSlide(i)} aria-label={`Slide ${i + 1}`}
                 className="h-2 rounded-full transition-all"
-                style={{ width: i === slide ? 22 : 8, background: i === slide ? "#2B2926" : "rgba(43,41,38,.3)" }} />
+                style={{ width: i === slide ? 22 : 8, background: i === slide ? "#1F2A22" : "rgba(43,41,38,.3)" }} />
             ))}
           </div>
         )}

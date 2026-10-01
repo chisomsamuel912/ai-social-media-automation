@@ -44,8 +44,8 @@ export default function LoginPage() {
 
   return (
     <main className="stage flex items-center justify-center px-4 py-14">
-      <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#9CAF88" }} />
-      <div className="orb orb-b" style={{ width: 440, height: 440, right: "-130px", bottom: "-140px", background: "#D9CFC0" }} />
+      <div className="orb" style={{ width: 420, height: 420, left: "-120px", top: "-100px", background: "#7CC48A" }} />
+      <div className="orb orb-b" style={{ width: 440, height: 440, right: "-130px", bottom: "-140px", background: "#C9E2CF" }} />
       <div className="glass relative w-full max-w-md p-8">
         {user ? (
           <div className="text-center">

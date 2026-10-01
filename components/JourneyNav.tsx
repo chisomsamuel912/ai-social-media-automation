@@ -14,7 +14,7 @@ export default function JourneyNav() {
   if (path === "/login") return null;
 
   return (
-    <header className="sticky top-0 z-20 border-b" style={{ background: "rgba(244,242,237,.9)", backdropFilter: "blur(10px)", borderColor: "#DDD8CC" }}>
+    <header className="sticky top-0 z-20 border-b" style={{ background: "rgba(244,242,237,.9)", backdropFilter: "blur(10px)", borderColor: "#CFDFCF" }}>
       <div className="mx-auto flex max-w-4xl items-center gap-1 overflow-x-auto px-4 py-2">
         <a href="/" className="serif mr-2 shrink-0 text-lg font-bold">Growpilot</a>
         {STEPS.map((s) => {
@@ -22,7 +22,7 @@ export default function JourneyNav() {
           return (
             <a key={s.href} href={s.href}
               className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium ${active ? "text-white" : "text-muted"}`}
-              style={active ? { background: "#2B2926" } : { background: "transparent" }}>
+              style={active ? { background: "#1F2A22" } : { background: "transparent" }}>
               {s.label}
             </a>
           );
